@@ -1,0 +1,47 @@
+#flex{
+  display: flex;
+}
+canvas{
+  border:2px solid black;
+}
+h1{
+  background-color:dodgerblue;
+  padding:20px;
+  font-family: 'Roboto', sans-serif;
+  font-size: 35px;
+}
+button {
+  background-color: dodgerblue;
+  margin-right: 15px;
+  padding: 10px;
+  font-weight: bold;
+  width:150px;
+  font-size: 20px;
+  font-family: 'Roboto', sans-serif;
+}
+button:hover{
+  color:white;
+  padding:15px;
+  width:160px;
+  background-color: blue;
+
+}
+ul{
+  list-style-type: none;
+  padding:0;
+  width:180px;
+}
+
+h1:hover{
+  color:white;
+}
+button:disabled{
+  background-color:lightblue;
+  color:white;
+}
+button:disabled:hover{
+  padding: 10px;
+  width: 150px;
+
+}
+

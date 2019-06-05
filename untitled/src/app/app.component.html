@@ -1,0 +1,25 @@
+<h1>Graph editor</h1>
+
+<div id="flex">
+  <ul>
+
+     <li><button (click)="pridajVrchol()">VERTEX</button></li>
+    <li><button (click)="addMultipol5()">MULTIPOL5</button></li>
+      <li><button (click)="addMultipol4()">MULTIPOL4</button></li>
+      <li><button (click)="addMultipol3()">MULTIPOL3</button></li>
+       <li><button (click)="addMultipol2()">MULTIPOL2</button></li>
+    <li><button (click)="zmaz()">DELETE</button></li>
+     <li><button (click)="undoMetoda()" [disabled]="disableUndo">UNDO</button></li>
+    <li><button (click)="redoMetoda()" [disabled]="disableRedo.redo">REDO</button></li>
+    <li><button id="vypocitaj">VYPOCITAJ</button></li>
+    <li><button (click)="vypisVrcholy()">VYPIS VRCHOLY</button></li>
+    <li><button (click)="vypisHrany()">VYPIS HRANY</button></li>
+    <li><button (click)="vypis_multipoly()">VYPIS MULTIPOLY</button></li>
+    <li><button (click)="calculate()">CALCULATE</button></li>
+    <li><button (click)="skusam_get()">skusam_get</button></li>
+    <li><button (click)="add_multipol1()">add_multipol1</button></li>
+
+   </ul>
+   <canvas width="1600" height="800" id="myCanvas"></canvas>
+ </div>
+
