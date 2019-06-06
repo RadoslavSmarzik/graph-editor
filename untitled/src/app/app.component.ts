@@ -10,7 +10,6 @@ import {Multipol2Command} from './Commandy/multipol2-command';
 import * as $ from 'jquery';
 import {Multipol5Command} from './Commandy/multipol5-command';
 
-//mozem spojit 2 semiedges jedneho multipola? zatial ano, este neviem ci to mozem ci nie, tak to zatial necham tak
 
 @Component({
   selector: 'app-root',
@@ -26,27 +25,25 @@ export class AppComponent implements OnInit {
   disableRedo: any;
   cisloVrchola: number;
   multipolmeno:number=1;
+  disableGet:Boolean;
+  hideMultipoly:Array<Boolean>;
+  menoMultipolov:Array<any>;
+
+
 
 
   ngOnInit(): void {
-    $(document).ready(function(){
-      $("h1").click(function(){
-        $(this).hide();
-      });
-    });
-    $("#vypocitaj").click(function(){
-      $.post("https://jsonplaceholder.typicode.com/posts", {"uno":Informacie.hranyVGrafe[0],
-        "duo":Informacie.hranyVGrafe[1]},function(data, status){
-        console.log("poslal som:");
-        for(let i=0;i<Informacie.hranyVGrafe.length;i++){
-          console.log(JSON.stringify(Informacie.hranyVGrafe[i]));
-        }
-        console.log("dostal som " +JSON.stringify(data));           //JSON.stringify(data)
-        alert("Data: "+data+" status: "+status);
-      });
-    });
+    this.hideMultipoly=[];
+    this.menoMultipolov=[];
+
+    for(let i=0;i<5;i++){
+      this.menoMultipolov.push("-----");
+      this.hideMultipoly.push(true);
+    }
+    this.disableGet = false;
 
 
+    Informacie.multipolyNaPouzitie = [];
     Informacie.redoBooelan = {redo:true};
     this.disableRedo=Informacie.redoBooelan;
     this.canvas = new fabric.Canvas('myCanvas');
@@ -130,6 +127,20 @@ export class AppComponent implements OnInit {
         }
         if(e.target.type == "multipol"){
           e.target.item(1).set("fill", "black");
+          const zhora = e.e.pageY;
+          const zlava = e.e.pageX;
+
+          Informacie.vizitka = new fabric.Text(e.target.vypis,{left: zlava -200,
+            top: zhora -120,
+            fill:"white",
+            backgroundColor: "black",
+            height: 12,
+            borderColor: "black",
+            fontSize: 25
+
+          });
+
+          Informacie.plocha.add(Informacie.vizitka);
           this.renderAll();
         }
         if(e.target.type == "multipol4" || e.target.type == "multipol3" || e.target.type == "multipol2" || e.target.type == "multipol5"){
@@ -145,11 +156,11 @@ export class AppComponent implements OnInit {
         const zlava = e.e.pageX;
         Informacie.vizitka = new fabric.Text(e.target.name,{left: zlava -200,
           top: zhora -120,
-          fill:"black",
-          backgroundColor: "dodgerblue",
-          height: 15,
+          fill:"white",
+          backgroundColor: "black",
+          height: 12,
           borderColor: "black",
-          fontSize: 30
+          fontSize: 25
 
         });
         Informacie.plocha.add(Informacie.vizitka);
@@ -192,48 +203,25 @@ export class AppComponent implements OnInit {
     for(let i=0;i<Informacie.multipolyVGrafe.length;i++){
       console.log(Informacie.multipolyVGrafe[i]);
     }
+    console.log(Informacie.multipolyVGrafe);
   }
 
-  add_multipol1(){
-    const url = "";
+  skusam_post(){
+    const url="https://jsonplaceholder.typicode.com/posts";
+    let udaje = {vertices:Informacie.vrcholyVGrafe,multipoles:Informacie.multipolyVGrafe,edges:Informacie.hranyVGrafe};
+    console.log(udaje);
 
-    $.get(url,function(data, status){
-      let multipol;
-
-      if(data.dangling_edges.length==2){
-          multipol = new Multipol2Command(this.multipolmeno,data.dangling_edges[0],data.dangling_edges[1]);
-      }
-      if(data.dangling_edges.length==3){
-         multipol = new Multipol3Command(this.multipolmeno,data.dangling_edges[0],data.dangling_edges[1],data.dangling_edges[2]);
-      }
-      if(data.dangling_edges.length==4){
-         multipol = new Multipol4Command(this.multipolmeno,data.dangling_edges[0],data.dangling_edges[1],data.dangling_edges[2],data.dangling_edges[3]);
-      }
-      if(data.dangling_edges.length==5){
-         multipol = new Multipol5Command(this.multipolmeno,data.dangling_edges[0],data.dangling_edges[1],data.dangling_edges[2],data.dangling_edges[3],data.dangling_edges[4]);
-      }
-
-      this.disableUndo=false;
-      this.disableRedo.redo=true;
-      this.multipolmeno++;
-      while(Informacie.commands.length>Informacie.momentalnyStav){
-        Informacie.commands.pop();
-      }
-      multipol.execute();
-      Informacie.commands.push(multipol);
-      Informacie.momentalnyStav=Informacie.commands.length;
-
+    $.post(url, udaje,function(data, status){
+      console.log("dostal som " +JSON.stringify(data));
+      alert("Data: "+data+" status: "+status);
     });
-
   }
-
 
 
 
   calculate(){
     const url="http://localhost:8080/graph";
-    let udaje = [];
-    udaje.push(Informacie.vrcholyVGrafe,Informacie.multipolyVGrafe,Informacie.hranyVGrafe);
+    let udaje = {vertices:Informacie.vrcholyVGrafe,multipoles:Informacie.multipolyVGrafe,edges:Informacie.hranyVGrafe};
     console.log(udaje);
 
     $.post(url, udaje,function(data, status){
@@ -248,6 +236,7 @@ export class AppComponent implements OnInit {
     for(let i=0;i<Informacie.hranyVGrafe.length;i++){
       console.log(Informacie.hranyVGrafe[i]);
     }
+    console.log(Informacie.hranyVGrafe);
 
   }
 
@@ -255,6 +244,7 @@ export class AppComponent implements OnInit {
     for(let i=0;i<Informacie.vrcholyVGrafe.length;i++){
       console.log(Informacie.vrcholyVGrafe[i]);
     }
+    console.log(Informacie.vrcholyVGrafe);
   }
 
   pridajVrchol(){
@@ -379,7 +369,7 @@ export class AppComponent implements OnInit {
   addMultipol5():void{
     this.disableUndo=false;
     this.disableRedo.redo=true;
-    const multipol5 = new Multipol5Command(this.multipolmeno,"fake1","fake2","fake3","fake4","fake5");
+    const multipol5 = new Multipol5Command(this.multipolmeno,"fake1","fake2","fake3","fake4","fake5","typ");
     this.multipolmeno++;
     while(Informacie.commands.length>Informacie.momentalnyStav){
       Informacie.commands.pop();
@@ -392,7 +382,7 @@ export class AppComponent implements OnInit {
 addMultipol4():void{
   this.disableUndo=false;
   this.disableRedo.redo=true;
-    const multipol4 = new Multipol4Command(this.multipolmeno,"fake1","fake2","fake3","fake4");
+    const multipol4 = new Multipol4Command(this.multipolmeno,"fake1","fake2","fake3","fake4","typ");
     this.multipolmeno++;
   while(Informacie.commands.length>Informacie.momentalnyStav){
     Informacie.commands.pop();
@@ -405,7 +395,7 @@ addMultipol4():void{
   addMultipol3():void{
     this.disableUndo=false;
     this.disableRedo.redo=true;
-    const multipol3 = new Multipol3Command(this.multipolmeno,"fake1","fake2","fake3");
+    const multipol3 = new Multipol3Command(this.multipolmeno,"fake1","fake2","fake3","typ");
     this.multipolmeno++;
     while(Informacie.commands.length>Informacie.momentalnyStav){
       Informacie.commands.pop();
@@ -418,7 +408,7 @@ addMultipol4():void{
   addMultipol2():void{
     this.disableUndo=false;
     this.disableRedo.redo=true;
-    const multipol2 = new Multipol2Command(this.multipolmeno,"fake1","fake2");
+    const multipol2 = new Multipol2Command(this.multipolmeno,"fake1","fake2","typ_zo_servera");
     this.multipolmeno++;
     while(Informacie.commands.length>Informacie.momentalnyStav){
       Informacie.commands.pop();
@@ -426,6 +416,95 @@ addMultipol4():void{
     multipol2.execute();
     Informacie.commands.push(multipol2);
     Informacie.momentalnyStav=Informacie.commands.length;
+
+  }
+
+  //pridavanie multipola zo servera
+
+  add_multipol(n:number){
+    let multipol;
+    if(Informacie.multipolyNaPouzitie.length<n+1){
+      console.log("multipoly nie su v databaze");
+      return;
+    }
+    let hrany = Informacie.multipolyNaPouzitie[n][1];
+    let typ = Informacie.multipolyNaPouzitie[n][0];
+
+    if(hrany.length == 2){
+      multipol = new Multipol2Command(this.multipolmeno,hrany[0],hrany[1],typ);
+    }
+    if(hrany.length == 3){
+      multipol = new Multipol3Command(this.multipolmeno,hrany[0],hrany[1],hrany[2],typ);
+
+    }
+    if(hrany.length == 4){
+      multipol = new Multipol4Command(this.multipolmeno,hrany[0],hrany[1],hrany[2],hrany[3],typ);
+
+    }
+    if(hrany.length == 5){
+      multipol = new Multipol5Command(this.multipolmeno,hrany[0],hrany[1],hrany[2],hrany[3],hrany[4],typ);
+
+    }
+
+    this.disableUndo=false;
+    this.disableRedo.redo=true;
+    this.multipolmeno++;
+    while(Informacie.commands.length>Informacie.momentalnyStav){
+      Informacie.commands.pop();
+    }
+    multipol.execute();
+    Informacie.commands.push(multipol);
+    Informacie.momentalnyStav=Informacie.commands.length;
+
+  }
+
+
+  get_multipols(){
+
+    const url = "http://localhost:8080/multipols";
+    $.get(url,function(data, status){
+
+      for(let i=0;i<data.length;i++){
+        let pole = [];
+        pole.push(data[i].name);
+        pole.push(data[i].dangling_edges);
+        Informacie.multipolyNaPouzitie.push(pole);
+      }
+
+    });
+    for(let i=0;i<Informacie.multipolyNaPouzitie.length;i++){
+      this.menoMultipolov[i]=Informacie.multipolyNaPouzitie[i][0];
+      this.hideMultipoly[i]=false;
+    }
+    this.disableGet=true;
+
+
+  }
+
+  get_multipols_fake(){
+
+    let pole = [];
+    let poleMult = ["i1", "i2", "o1", "o2", "r"];
+    pole.push("negator_Pg");
+    pole.push(poleMult);
+    Informacie.multipolyNaPouzitie.push(pole);
+    pole = [];
+    poleMult = ["i1", "i2", "o1", "o2"];
+    pole.push("isochromatic_Pg");
+    pole.push(poleMult);
+    Informacie.multipolyNaPouzitie.push(pole);
+    pole = [];
+    poleMult = ["i1", "i2", "o1", "o2", "o3"];
+    pole.push("(2,3)-pole_Pg");
+    pole.push(poleMult);
+    Informacie.multipolyNaPouzitie.push(pole);
+
+    for(let i=0;i<Informacie.multipolyNaPouzitie.length;i++){
+      this.menoMultipolov[i]=Informacie.multipolyNaPouzitie[i][0];
+      this.hideMultipoly[i]=false;
+    }
+    this.disableGet=true;
+
 
   }
 

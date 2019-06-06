@@ -10,20 +10,20 @@ export class Multipol3Command implements Command{
   multipol:any;
   array:any;
   prvykrat:boolean;
-  meno:string;
+  meno:number;
   multipolJS:any;
 
 
 
 
-  constructor(meno,fake1meno,fake2meno,fake3meno){
+  constructor(meno,fake1meno,fake2meno,fake3meno,type){
     this.multipolJS={
-      type:"multipol3",
-      name:meno.toString(),
+      name:type,
+      id:meno,
 
 
     };
-    this.meno = meno.toString();
+    this.meno = meno;
     this.prvykrat=true;
     this.array = new Array();
 
@@ -46,6 +46,7 @@ export class Multipol3Command implements Command{
     this.multipol.addWithUpdate(stredKruh);
     this.multipol.addWithUpdate(text);
     this.multipol.set("type","multipol");
+    this.multipol.set("vypis",type);
     this.multipol.set("left",100);
     this.multipol.set("top",200);
     this.multipol.set("name",this.meno); // tu mozno radse meno.toString()
@@ -108,6 +109,8 @@ export class Multipol3Command implements Command{
       Informacie.poleMultipolov[this.name][4].set("top",this.suradnicaTop);
       this.item(0).set("fill",Informacie.poleMultipolov[this.name][4].zakladnaFarba);
       Informacie.plocha.add(Informacie.poleMultipolov[this.name][4]);
+
+      Informacie.plocha.remove(Informacie.vizitka);  //odstrani vizitku ktora je stale na ploche
       Informacie.plocha.renderAll();
 
 
@@ -153,9 +156,9 @@ export class Multipol3Command implements Command{
       this.array[i].set("typ_multipola","multipol3");
     }
 
-    let fake1JS = {type:"multipol",name:this.meno,semi_edge:this.fake1.name};
-    let fake2JS = {type:"multipol",name:this.meno,semi_edge:this.fake2.name};
-    let fake3JS = {type:"multipol",name:this.meno,semi_edge:this.fake3.name};
+    let fake1JS = {type:"multipol",id:this.meno,dangling_edge:this.fake1.name};
+    let fake2JS = {type:"multipol",id:this.meno,dangling_edge:this.fake2.name};
+    let fake3JS = {type:"multipol",id:this.meno,dangling_edge:this.fake3.name};
 
     this.fake1.set("reprezentaciaJS",fake1JS);
     this.fake2.set("reprezentaciaJS",fake2JS);

@@ -144,6 +144,8 @@ export class HranaCommand implements Command{
             Informacie.poleMultipolov[this.name][5].set("top", this.suradnicaTop);
             Informacie.plocha.add(Informacie.poleMultipolov[this.name][5]);
             Informacie.poleMultipolov[this.name][0].item(0).set("fill", Informacie.poleMultipolov[this.name][5].zakladnaFarba);
+
+            Informacie.plocha.remove(Informacie.vizitka);
             Informacie.plocha.renderAll();
 
 
@@ -160,6 +162,8 @@ export class HranaCommand implements Command{
             Informacie.poleMultipolov[this.name][6].set("top", this.suradnicaTop);
             Informacie.plocha.add(Informacie.poleMultipolov[this.name][6]);
             Informacie.poleMultipolov[this.name][0].item(0).set("fill", Informacie.poleMultipolov[this.name][6].zakladnaFarba);
+
+            Informacie.plocha.remove(Informacie.vizitka);
             Informacie.plocha.renderAll();
 
 
@@ -177,6 +181,8 @@ export class HranaCommand implements Command{
             Informacie.poleMultipolov[this.name][4].set("top", this.suradnicaTop);
             Informacie.plocha.add(Informacie.poleMultipolov[this.name][4]);
             Informacie.poleMultipolov[this.name][0].item(0).set("fill", Informacie.poleMultipolov[this.name][4].zakladnaFarba);
+
+            Informacie.plocha.remove(Informacie.vizitka);
             Informacie.plocha.renderAll();
 
 
@@ -194,6 +200,8 @@ export class HranaCommand implements Command{
             Informacie.poleMultipolov[this.name][3].set("top", this.suradnicaTop);
             Informacie.plocha.add(Informacie.poleMultipolov[this.name][3]);
             Informacie.poleMultipolov[this.name][0].item(0).set("fill", Informacie.poleMultipolov[this.name][3].zakladnaFarba);
+
+            Informacie.plocha.remove(Informacie.vizitka);
             Informacie.plocha.renderAll();
 
 
@@ -221,6 +229,8 @@ export class HranaCommand implements Command{
             Informacie.poleMultipolov[this.name][5].set("top", this.suradnicaTop);
             Informacie.plocha.add(Informacie.poleMultipolov[this.name][5]);
             Informacie.poleMultipolov[this.name][0].item(0).set("fill", Informacie.poleMultipolov[this.name][5].zakladnaFarba);
+
+            Informacie.plocha.remove(Informacie.vizitka);
             Informacie.plocha.renderAll();
           });
         }
@@ -235,6 +245,8 @@ export class HranaCommand implements Command{
             Informacie.poleMultipolov[this.name][6].set("top", this.suradnicaTop);
             Informacie.plocha.add(Informacie.poleMultipolov[this.name][6]);
             Informacie.poleMultipolov[this.name][0].item(0).set("fill", Informacie.poleMultipolov[this.name][6].zakladnaFarba);
+
+            Informacie.plocha.remove(Informacie.vizitka);
             Informacie.plocha.renderAll();
           });
         }
@@ -250,6 +262,8 @@ export class HranaCommand implements Command{
             Informacie.poleMultipolov[this.name][4].set("top", this.suradnicaTop);
             Informacie.plocha.add(Informacie.poleMultipolov[this.name][4]);
             Informacie.poleMultipolov[this.name][0].item(0).set("fill", Informacie.poleMultipolov[this.name][4].zakladnaFarba);
+
+            Informacie.plocha.remove(Informacie.vizitka);
             Informacie.plocha.renderAll();
 
 
@@ -267,6 +281,8 @@ export class HranaCommand implements Command{
             Informacie.poleMultipolov[this.name][3].set("top", this.suradnicaTop);
             Informacie.plocha.add(Informacie.poleMultipolov[this.name][3]);
             Informacie.poleMultipolov[this.name][0].item(0).set("fill", Informacie.poleMultipolov[this.name][3].zakladnaFarba);
+
+            Informacie.plocha.remove(Informacie.vizitka);
             Informacie.plocha.renderAll();
 
 

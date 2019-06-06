@@ -9,18 +9,17 @@ export class Multipol2Command implements Command{
   multipol:any;
   array:any;
   prvykrat:boolean;
-  meno:string;
+  meno:number;
   multipolJS:any;
 
 
-  constructor(meno,fake1meno,fake2meno){
+  constructor(meno,fake1meno,fake2meno,type){
     this.multipolJS={
-      type:"multipol2",
-      name:meno.toString(),
-
-
+      name:type,
+      id:meno,
     };
-    this.meno = meno.toString();
+
+    this.meno = meno;
     this.prvykrat=true;
     this.array = new Array();
 
@@ -43,6 +42,7 @@ export class Multipol2Command implements Command{
     this.multipol.addWithUpdate(stredKruh);
     this.multipol.addWithUpdate(text);
     this.multipol.set("type","multipol");
+    this.multipol.set("vypis",type);
     this.multipol.set("left",100);
     this.multipol.set("top",200);
     this.multipol.set("name",this.meno); // tu mozno radse meno.toString()
@@ -95,6 +95,8 @@ export class Multipol2Command implements Command{
       Informacie.poleMultipolov[this.name][3].set("top",this.suradnicaTop);
       this.item(0).set("fill",Informacie.poleMultipolov[this.name][3].zakladnaFarba);
       Informacie.plocha.add(Informacie.poleMultipolov[this.name][3]);
+
+      Informacie.plocha.remove(Informacie.vizitka);
       Informacie.plocha.renderAll();
 
 
@@ -139,8 +141,8 @@ export class Multipol2Command implements Command{
       this.array[i].set("typ_multipola","multipol2");
     }
 
-    let fake1JS = {type:"multipol",name:this.meno,semi_edge:this.fake1.name};
-    let fake2JS = {type:"multipol",name:this.meno,semi_edge:this.fake2.name};
+    let fake1JS = {type:"multipol",id:this.meno,dangling_edge:this.fake1.name};
+    let fake2JS = {type:"multipol",id:this.meno,dangling_edge:this.fake2.name};
 
 
     this.fake1.set("reprezentaciaJS",fake1JS);

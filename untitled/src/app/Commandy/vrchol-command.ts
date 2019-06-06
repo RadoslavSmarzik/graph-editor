@@ -13,7 +13,7 @@ export class VrcholCommand implements Command{
 
   constructor(c,meno){
     this.meno=meno;
-    this.vrcholJS = { type:"vertex", name:meno.toString()};
+    this.vrcholJS = { type:"vertex", id:meno};
     this.plocha=c;
     this.vrchol = new fabric.Circle({
       radius:30,
@@ -63,7 +63,6 @@ export class VrcholCommand implements Command{
   execute() {
     this.plocha.add(this.group);
     this.plocha.moveTo(this.group, 100);
-    Informacie.vrcholyVGrafe.push(this.vrcholJS);
     Informacie.vrcholyVGrafe.push(this.meno);
 
   }

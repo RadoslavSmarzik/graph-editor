@@ -14,6 +14,7 @@ export class Informacie {
   static redoBooelan: any;
   static vizitka: any;
   static vrcholyVGrafe:Array<number>;
+  static multipolyNaPouzitie:Array<any>;
 
 
 }
