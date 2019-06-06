@@ -79,13 +79,10 @@ int main(int argc, char const *argv[]) {
         perror("accept");
         exit(EXIT_FAILURE);
     }
-	//
+	
 	std::ifstream in("pole_multipolov.txt");
 	json m;
 	in >> m;
-	//std::string s = m.dump();
-	//std::cout << m[1]["dangling_edges_mapping"][0] << std::endl;
-	//
 	
     valread = read(new_socket, buffer, 300000);
 	printf("%s\n", buffer);
@@ -125,6 +122,8 @@ int main(int argc, char const *argv[]) {
 		const char * odpoved = str.c_str();
 		send(new_socket, odpoved, strlen(odpoved), 0);
 	}else if (request.uri.compare(0,10,"/multipole")==0){
+	
+		std::string s = m.dump();
 		
 		string str="HTTPS/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
 		const char * odpoved = str.c_str();
