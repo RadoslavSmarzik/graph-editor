@@ -480,7 +480,7 @@ addMultipol4():void{
 
 
   }
-
+//tu len skusam to co dostanem od servera ci to viem spracovat
   get_multipols_fake(){
 
     let pole = [];
