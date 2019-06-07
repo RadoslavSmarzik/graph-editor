@@ -23,6 +23,7 @@ export class HranaCommand implements Command{
 
   }
 
+  //pridanie novej hrany, suradnice polyline sa vypocitavaju podla toho kolko ma multipol vytrcajucich hran
   execute() {
     const points = [];
 
@@ -103,6 +104,7 @@ export class HranaCommand implements Command{
 
   }
 
+  //odstrani hranu a podla toho kolko ma multipol este ku sebe pripojenych hran, ak tych hran je 0 tak mu nastavime to ze doubleclickom s nim mozme opat hybat
   unexecute() {
     Informacie.plocha.remove(this.polyLine);
     let index = Informacie.hranyVGrafe.indexOf(this.hranaJS);

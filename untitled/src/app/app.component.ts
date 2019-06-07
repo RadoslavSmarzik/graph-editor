@@ -17,14 +17,13 @@ import {Multipol5Command} from './Commandy/multipol5-command';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  pocetVrcholov: number;
   canvas: any;
   disableStart: Boolean;
   disableStop: Boolean;
   disableUndo: Boolean;
   disableRedo: any;
   cisloVrchola: number;
-  multipolmeno:number=1;
+  multipolmeno:number;
   disableGet:Boolean;
   hideMultipoly:Array<Boolean>;
   menoMultipolov:Array<any>;
@@ -33,16 +32,9 @@ export class AppComponent implements OnInit {
 
 
   ngOnInit(): void {
-    this.hideMultipoly=[];
-    this.menoMultipolov=[];
-
-    for(let i=0;i<5;i++){
-      this.menoMultipolov.push("-----");
-      this.hideMultipoly.push(true);
-    }
-    this.disableGet = false;
-
-
+    //inicializacia
+    this.cisloVrchola = 1;
+    this.multipolmeno=1;
     Informacie.multipolyNaPouzitie = [];
     Informacie.redoBooelan = {redo:true};
     this.disableRedo=Informacie.redoBooelan;
@@ -51,20 +43,27 @@ export class AppComponent implements OnInit {
     this.disableStop = true;
     this.disableUndo = true;
     this.disableRedo.redo=true;
-    this.pocetVrcholov = 0;
     Informacie.momentalnyStav = 0;
     Informacie.commands=[];
     Informacie.poleMultipolov = new Array();
-    this.cisloVrchola = 1;
     Informacie.plocha=this.canvas;
     Informacie.vrcholyVGrafe = new Array();
     Informacie.multipolyVGrafe = new Array();
     Informacie.hranyVGrafe = new Array();
     Informacie.vrcholyVGrafe = new Array<number>();
+    Informacie.aktualneViditelneMeno = null;
+    this.hideMultipoly=[];
+    this.menoMultipolov=[];
+    this.disableGet = false;
+    //najprv su buttony na multipoly, ktore pridavam z databazy skryte
+    for(let i=0;i<5;i++){
+      this.menoMultipolov.push("-----");
+      this.hideMultipoly.push(true);
+    }
 
 
+    //nastavenie selektovania objektov na ploche, ked selektnem 2 vrcholy alebo 2 dagling_edge(alebo vrchol a dagling_edge) hned za sebou tak sa vytvori hrana
     this.canvas.on("object:selected", function (e) {
-
         Informacie.selectedVrchol = e.target;
       if (e.target.type == "vertex"){
         e.target.item(0).set("fill", "#1E90FF");
@@ -114,11 +113,9 @@ export class AppComponent implements OnInit {
       Informacie.druhyVrchol = null;
       Informacie.prvyVrchol = e.target;
 
-
-
     });
 
-
+    //nastavovanie toho, ze ked prejdem nad nejakym objektom ukaze sa jeho meno
     this.canvas.on('mouse:over', function (e) {
       if (e.target instanceof fabric.Group) {
         if(e.target.type =="vertex" ) {
@@ -145,6 +142,7 @@ export class AppComponent implements OnInit {
         }
         if(e.target.type == "multipol4" || e.target.type == "multipol3" || e.target.type == "multipol2" || e.target.type == "multipol5"){
           e.target.item(0).item(1).set("fill", "black");
+          Informacie.aktualneViditelneMeno = e.target.item(0).item(1);
           this.renderAll();
         }
 
@@ -178,17 +176,22 @@ export class AppComponent implements OnInit {
           e.target.item(1).set("fill", "transparent");
           this.renderAll();
         }
-        if(e.target.type == "multipol4" || e.target.type == "multipol3" || e.target.type == "multipol2" || e.target.type == "multipol5"){
+        /*if(e.target.type == "multipol4" || e.target.type == "multipol3" || e.target.type == "multipol2" || e.target.type == "multipol5"){
           e.target.item(0).item(1).set("fill", "transparent");
-          this.renderAll();
-        }
+          this.renderAll();                                      //bol tu bug, tak som to vyriesil cez Informacie.aktualneViditelneMeno
+        }*/
+      }
+      if(Informacie.aktualneViditelneMeno!=null) {
+        Informacie.aktualneViditelneMeno.set("fill", "transparent");
       }
       Informacie.plocha.remove(Informacie.vizitka);
+      this.renderAll();
     });
 
 
   }
 
+  //skusam get a post a funkcie na pomocne vypisovanie hran, vrcholov a multipolov na konzolu, pri odovzdavani tieto funkcie zmazem
   skusam_get(){
     const url = "https://jsonplaceholder.typicode.com/posts";
 
@@ -216,22 +219,6 @@ export class AppComponent implements OnInit {
       alert("Data: "+data+" status: "+status);
     });
   }
-
-
-
-  calculate(){
-    const url="http://localhost:8080/graph";
-    let udaje = {vertices:Informacie.vrcholyVGrafe,multipoles:Informacie.multipolyVGrafe,edges:Informacie.hranyVGrafe};
-    console.log(udaje);
-
-    $.post(url, udaje,function(data, status){
-      console.log("dostal som " +JSON.stringify(data));
-      alert("Data: "+data+" status: "+status);
-    });
-
-
-  }
-
   vypisHrany() {
     for(let i=0;i<Informacie.hranyVGrafe.length;i++){
       console.log(Informacie.hranyVGrafe[i]);
@@ -247,6 +234,23 @@ export class AppComponent implements OnInit {
     console.log(Informacie.vrcholyVGrafe);
   }
 
+
+  //funkcia, ktora bude serveruposielat vsetky hrany, vrcholy a multipoly v grafe ako jeden velky json, tu este neviem co konkretne budem spracovavat od neho ze ake vsetky vypocty mi posle
+  calculate(){
+    const url="http://localhost:8080/graph";
+    let udaje = {vertices:Informacie.vrcholyVGrafe,multipoles:Informacie.multipolyVGrafe,edges:Informacie.hranyVGrafe};
+    console.log(udaje);
+
+    $.post(url, udaje,function(data, status){
+      console.log("dostal som " +JSON.stringify(data));
+      alert("Data: "+data+" status: "+status);
+    });
+
+
+  }
+
+
+ //pridanie vrchola na plochu
   pridajVrchol(){
     this.disableUndo=false;
     this.disableRedo.redo = true;
@@ -260,18 +264,18 @@ export class AppComponent implements OnInit {
     this.cisloVrchola++;
 
   }
-  zmaz(){
+  //zmaze uplne vsetko, nejde undo
+  zmaz_vsetko(){
     Informacie.plocha.clear();
     Informacie.multipolyVGrafe=[];
     Informacie.vrcholyVGrafe=[];
     Informacie.hranyVGrafe=[];
-
     Informacie.momentalnyStav = 0;
     this.disableUndo=true;
   }
 
 
-
+  //vykonva undo na pridavanie hran, multipolov a vrcholov
   undoMetoda():void{
     Informacie.commands[Informacie.momentalnyStav-1].unexecute();
     Informacie.momentalnyStav--;
@@ -283,6 +287,7 @@ export class AppComponent implements OnInit {
 
   }
 
+  //vykonava redo na pridavanie hran, multipolov a vrcholov
   redoMetoda():void{
     this.disableUndo=false;
     Informacie.plocha.forEachObject(function(obj){
@@ -352,8 +357,8 @@ export class AppComponent implements OnInit {
   }
 
 
-  clear():void{   //tu este doplnit ze sa unexucutuju veci co su na ploche
-    const clearCommand = new ClearCommand(this.canvas,this.pocetVrcholov);
+  clear():void{   //tu este doplnit ze sa unexucutuju veci co su na ploche, mozno vymazat toto este si to rozmyslim
+    const clearCommand = new ClearCommand(this.canvas,0);
     this.disableRedo.redo=true;
     this.disableUndo=false;
     while(Informacie.commands.length>Informacie.momentalnyStav){
@@ -366,6 +371,7 @@ export class AppComponent implements OnInit {
 
   }
 
+  //pomocna funkcia ktora prida multipol s 5 vytrcajucimi hranami
   addMultipol5():void{
     this.disableUndo=false;
     this.disableRedo.redo=true;
@@ -378,7 +384,7 @@ export class AppComponent implements OnInit {
     Informacie.commands.push(multipol5);
     Informacie.momentalnyStav=Informacie.commands.length;
   }
-
+//pomocna funkcia ktora prida multipol so 4 vytrcajucimi hranami
 addMultipol4():void{
   this.disableUndo=false;
   this.disableRedo.redo=true;
@@ -391,7 +397,7 @@ addMultipol4():void{
   Informacie.commands.push(multipol4);
   Informacie.momentalnyStav=Informacie.commands.length;
 }
-
+//pomocna funkcia ktora prida multipol s 3 vytrcajucimi hranami
   addMultipol3():void{
     this.disableUndo=false;
     this.disableRedo.redo=true;
@@ -404,7 +410,7 @@ addMultipol4():void{
     Informacie.commands.push(multipol3);
     Informacie.momentalnyStav=Informacie.commands.length;
   }
-
+//pomocna funkcia ktora prida multipol s 2 vytrcajucimi hranami
   addMultipol2():void{
     this.disableUndo=false;
     this.disableRedo.redo=true;
@@ -419,14 +425,14 @@ addMultipol4():void{
 
   }
 
-  //pridavanie multipola zo servera
 
+  //fukcia, ktoru vyuzivaju buttony ktore sa ukazu az ked dostaneme zo servera pole multipolov, prida novy multipol na plochu
   add_multipol(n:number){
     let multipol;
-    if(Informacie.multipolyNaPouzitie.length<n+1){
+    /*if(Informacie.multipolyNaPouzitie.length<n+1){  //mozem to dat teraz aj prec
       console.log("multipoly nie su v databaze");
       return;
-    }
+    }*/
     let hrany = Informacie.multipolyNaPouzitie[n][1];
     let typ = Informacie.multipolyNaPouzitie[n][0];
 
@@ -458,10 +464,9 @@ addMultipol4():void{
 
   }
 
-
-  get_multipols(){
-
-    const url = "http://localhost:8080/multipols";
+ //funkcia ktora zo servera vypyta pole multipolov a tieto multipoly si globalne ulozi, buttony ktore bude vyuzivat zmeni na viditelne a nastavi im mena podla polzky name
+  get_multipoles(){
+    const url = "http://localhost:8080/multipol";
     $.get(url,function(data, status){
 
       for(let i=0;i<data.length;i++){
@@ -480,8 +485,8 @@ addMultipol4():void{
 
 
   }
-//tu len skusam to co dostanem od servera ci to viem spracovat
-  get_multipols_fake(){
+//tu len skusam to co dostanem od servera ci to viem spracovat, len to co vlastne ocakavam ze dostanem od servera
+  get_multipoles_fake(){
 
     let pole = [];
     let poleMult = ["i1", "i2", "o1", "o2", "r"];

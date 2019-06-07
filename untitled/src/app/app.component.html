@@ -8,7 +8,7 @@
       <li><button (click)="addMultipol4()">MULTIPOL4</button></li>
       <li><button (click)="addMultipol3()">MULTIPOL3</button></li>
        <li><button (click)="addMultipol2()">MULTIPOL2</button></li>
-    <li><button (click)="zmaz()">DELETE ALL</button></li>
+    <li><button (click)="zmaz_vsetko()">DELETE ALL</button></li>
      <li><button (click)="undoMetoda()" [disabled]="disableUndo">UNDO</button></li>
     <li><button (click)="redoMetoda()" [disabled]="disableRedo.redo">REDO</button></li>
     <li><button id="vypocitaj">VYPOCITAJ</button></li>
@@ -18,7 +18,7 @@
     <li><button (click)="calculate()">CALCULATE</button></li>
     <li><button (click)="skusam_get()">skusam_get</button></li>
     <li><button (click)="skusam_post()">skusam_post</button></li>
-    <li><button [disabled]="disableGet" (click)="get_multipols_fake()">MULTIPOLS</button></li>
+    <li><button [disabled]="disableGet" (click)="get_multipoles_fake()">MULTIPOLS</button></li>
     <li><button class="multipoly" (click)="add_multipol(0)" [hidden]="hideMultipoly[0]">{{menoMultipolov[0]}}</button></li>
     <li><button class="multipoly" (click)="add_multipol(1)" [hidden]="hideMultipoly[1]">{{menoMultipolov[1]}}</button></li>
     <li><button class="multipoly" (click)="add_multipol(2)" [hidden]="hideMultipoly[2]">{{menoMultipolov[2]}}</button></li>

@@ -15,6 +15,7 @@ export class Informacie {
   static vizitka: any;
   static vrcholyVGrafe:Array<number>;
   static multipolyNaPouzitie:Array<any>;
+  static  aktualneViditelneMeno:any;
 
 
 }
