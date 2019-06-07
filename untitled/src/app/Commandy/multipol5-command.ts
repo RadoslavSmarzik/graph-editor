@@ -149,7 +149,7 @@ export class Multipol5Command implements Command{
         Informacie.plocha.add(this.item(i));
       }
       this.item(0).item(0).set("fill",this.farbaSpojenia);
-
+      Informacie.aktualneViditelneMeno.set("fill","transparent");   //iba mensia uprava, lebo obcas to bolo viditelne aj ked namalo byt
       Informacie.plocha.remove(this);
       Informacie.plocha.renderAll();
     });

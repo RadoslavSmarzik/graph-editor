@@ -112,6 +112,7 @@ export class HranaCommand implements Command{
   //  Informacie.hranyVGrafe.splice(this.hranaJS,1);
     this.prvy.set("pocetHran",this.prvy.pocetHran-1);
     this.druhy.set("pocetHran",this.druhy.pocetHran-1);
+    //prepocet kolko hran vedie z vchola a podla toho mu umoznime sa hybat
     if(this.prvy.pocetHran == 0 && this.prvy.type == "vertex"){
       this.prvy.lockMovementX = false;
       this.prvy.lockMovementY = false;
@@ -126,7 +127,7 @@ export class HranaCommand implements Command{
       this.druhy.set("aktualnaFarba",this.druhy.zakladnaFarba);
     }
 
-
+    //prepocet kolko hran ide z multipola a podla toho pridavame doublecklick na stred multipola
     if(this.prvy.type == "fakeVrchol"){
       Informacie.plocha.add(this.prvy);
 
@@ -212,6 +213,8 @@ export class HranaCommand implements Command{
 
       }
     }
+
+    //prepocet kolko hran ide z multipola a podla toho pridavame doublecklick na stred multipola
     if(this.druhy.type == "fakeVrchol"){
       Informacie.plocha.add(this.druhy);
 
