@@ -39,7 +39,13 @@ using namespace std;
 using namespace ba_graph;
 using namespace httpparser;
 
-int n=3; //pocet multipolov
+json datab_mult(){
+	std::ifstream in("pole_multipolov.txt");
+	json m;
+	in >> m;
+	in.close();
+	return m;
+}
 
 int main(int argc, char const *argv[]) {
 	Graph gr=create_isaacs(11);            //pouzivanie na skusku nieco z ba_graphu
@@ -49,7 +55,7 @@ int main(int argc, char const *argv[]) {
     struct sockaddr_in address;
     int opt = 1;
     int addrlen = sizeof (address);
-    char buffer[300000] = {0};
+    char buffer[800000] = {0};
 
    
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
@@ -72,7 +78,7 @@ int main(int argc, char const *argv[]) {
         exit(EXIT_FAILURE);
     }
 	
-     //while(1){ // 
+    //while(1){ // 
 
     if ((new_socket = accept(server_fd, (struct sockaddr *) &address,
             (socklen_t*) & addrlen)) < 0) {
@@ -80,12 +86,8 @@ int main(int argc, char const *argv[]) {
         exit(EXIT_FAILURE);
     }
 	
-	std::ifstream in("pole_multipolov.txt");
-	json m;
-	in >> m;
-	
-    valread = read(new_socket, buffer, 300000);
-	printf("%s\n", buffer);
+    valread = read(new_socket, buffer, 800000);
+	printf("%s\n", buffer);//
 	
 	Request request;
     HttpRequestParser parser;
@@ -97,48 +99,111 @@ int main(int argc, char const *argv[]) {
 	std::string data(request.content.begin(), request.content.end());
 	std::cout << data << std::endl;
 	
-	//json inf= json::parse(data);
+	//json inf= json::parse(data);//
 	
-	if(request.uri.compare(0,6,"/graph")==0){
-		bool b = true;
-		/*Graph g = createG();
-		int i;
-		for (auto& element : inf["vertices"]) {
-			addV(g, element);
-	    }
-		for (auto& element : m) {
-			if(element["name"]==inf){
-				b = false;
+	if(request.method == "POST"){
+		if(request.uri.compare(0,6,"/graph")==0){
+			json m = datab_mult();
+			Graph g = createG();
+		
+			for (auto& e : inf["vertices"]) {
+				addV(g, e);
 			}
-		}
-		if(b){
-		string str="HTTPS/1.1 404 NOT FOUND\nContent-Type: text/html\n\n<html><body>NOT FOUND</body></html>";
-		const char * odpoved = str.c_str();
-		send(new_socket, odpoved, strlen(odpoved), 0);
-		}
-		write_sparse6(g);
-		*/
-		string str="HTTPS/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
-		const char * odpoved = str.c_str();
-		send(new_socket, odpoved, strlen(odpoved), 0);
-	}else if (request.uri.compare(0,10,"/multipole")==0){
-	
-		std::string s = m.dump();
+			for (auto& e : inf["edges"]) {
+				if(e["first"]["type"]=="multipol" && e["second"]["type"]=="vertex"){
+					for (auto& j : inf["multipoles"]) {
+						if(j["id"] == e["first"]["id"]){
+							for (auto& k : m) {
+								if(j["name"] == k["name"]){
+								
+									//addE(k["dangling_edges_mapping"][e["first"]["dangling_edge"]], e["second"]["id"]);							
+									break;
+								}	
+							}
+							break;
+						}
+					}									
+				}else if(e["second"]["type"]=="multipol" && e["first"]["type"]=="vertex"){
+					for (auto& j : inf["multipoles"]) {
+						if(j["id"] == e["second"]["id"]){
+							for (auto& k : m) {
+								if(j["name"] == k["name"]){
+								
+									//addE(k["dangling_edges_mapping"][e["second"]["dangling_edge"]], e["first"]["id"]);							
+									break;
+								}	
+							}
+							break;
+						}
+					}					
+				}else if(e["first"]["type"]=="multipol" && e["second"]["type"]=="multipol"){
+					int num = 0;
+					for (auto& j : inf["multipoles"]) {
+						if(j["id"] == e["first"]["id"]){
+							for (auto& k : m) {
+								if(j["name"] == k["name"]){
+								
+									//=k["dangling_edges_mapping"][e["first"]["dangling_edge"]];//premenna
+									num++;
+									break;
+								}	
+							}	
+						}else if(j["id"] == e["second"]["id"]){									//nemam osetrene ze sa multipol spoji sam so sebou
+							for (auto& k : m) {
+								if(j["name"] == k["name"]){
+								
+									//=k["dangling_edges_mapping"][e["second"]["dangling_edge"]];  //premenna
+									num++;
+									break;
+								}	
+							}
+						}
+						if(num==2){
+							break;
+						}	
+					}	
+					add;
+							
+				}else if(e["first"]["type"]=="vertex" && e["second"]["type"]=="vertex"){
+					addE(g, Location(e["first"]["id"], e["second"]["id"]));
+				}else{	
+					string str="HTTPS/1.1 404 NOT FOUND\nContent-Type: text/html\n\n<html><body>NOT FOUND</body></html>";
+					const char * resp = str.c_str();
+					send(new_socket, resp, strlen(resp), 0);			
+				}
+			}				
+			write_sparse6(g);
 		
-		string str="HTTPS/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
-		const char * odpoved = str.c_str();
-		send(new_socket, odpoved, strlen(odpoved), 0);
-		
-	}else if (request.uri.compare(0,12,"/favicon.ico")==0){
+			string str="HTTPS/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
+			const char * resp = str.c_str();
+			send(new_socket, resp, strlen(resp), 0);
+		}else if (request.uri.compare(0,12,"/favicon.ico")==0){
 	
-	}else if (request.uri.compare(0,6,"/close")==0){
-		in.close();
-		//break;
-	}else{
-		string str="HTTPS/1.1 404 NOT FOUND\nContent-Type: text/html\n\n<html><body>NOT FOUND</body></html>";
-		const char * odpoved = str.c_str();
-		send(new_socket, odpoved, strlen(odpoved), 0);		
-	}
+		}else if (request.uri.compare(0,6,"/close")==0){
+			//break;//
+		}else{
+			string str="HTTPS/1.1 404 NOT FOUND\nContent-Type: text/html\n\n<html><body>NOT FOUND</body></html>";
+			const char * resp = str.c_str();
+			send(new_socket, resp, strlen(resp), 0);		
+		}
+	}else if(request.method == "GET"){
+		if(request.uri.compare(0,9,"/multipol")==0){
+			json m = datab_mult();
+			std::string s = m.dump();//m.dump(4)
+		
+			string str="HTTPS/1.1 200 OK\nContent-Type: application/json\n\n" + s;
+			const char * resp = str.c_str();
+			send(new_socket, resp, strlen(resp), 0);	
+		}else if (request.uri.compare(0,12,"/favicon.ico")==0){
+	
+		}else if (request.uri.compare(0,6,"/close")==0){
+			//break;//
+		}else{
+			string str="HTTPS/1.1 404 NOT FOUND\nContent-Type: text/html\n\n<html><body>NOT FOUND</body></html>";
+			const char * resp = str.c_str();
+			send(new_socket, resp, strlen(resp), 0);		
+		}
+	}	
 	
     //}//
     return 0;
