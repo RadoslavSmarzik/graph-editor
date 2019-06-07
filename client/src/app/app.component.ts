@@ -95,7 +95,7 @@ export class AppComponent implements OnInit {
       if(activeObj.type =="vertex") {
         activeObj.item(0).set("fill", "#1E90FF");
       }
-      
+
       Informacie.selectedVrchol = activeObj;
 
       Informacie.druhyVrchol = e.target;
