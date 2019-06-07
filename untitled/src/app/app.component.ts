@@ -1,6 +1,5 @@
 import {Component, OnInit} from '@angular/core';
 import {fabric} from 'fabric';
-import {ClearCommand} from './Commandy/clear-command';
 import {VrcholCommand} from './Commandy/vrchol-command';
 import {Informacie} from './informacie';
 import {HranaCommand} from './Commandy/hrana-command';
@@ -96,18 +95,21 @@ export class AppComponent implements OnInit {
       if(activeObj.type =="vertex") {
         activeObj.item(0).set("fill", "#1E90FF");
       }
+      
       Informacie.selectedVrchol = activeObj;
 
       Informacie.druhyVrchol = e.target;
       if ((Informacie.prvyVrchol.type == "vertex" || Informacie.prvyVrchol.type == "fakeVrchol") && (Informacie.druhyVrchol.type == "vertex" || Informacie.druhyVrchol.type == "fakeVrchol")) {
-        const h = new HranaCommand(Informacie.prvyVrchol, Informacie.druhyVrchol, this);
-        h.execute();
-        while(Informacie.commands.length>Informacie.momentalnyStav){
-          Informacie.commands.pop();
-        }
-        Informacie.redoBooelan.redo=true;
-        Informacie.commands.push(h);
-        Informacie.momentalnyStav = Informacie.commands.length;
+
+          const h = new HranaCommand(Informacie.prvyVrchol, Informacie.druhyVrchol, this);
+          h.execute();
+          while (Informacie.commands.length > Informacie.momentalnyStav) {
+            Informacie.commands.pop();
+          }
+          Informacie.redoBooelan.redo = true;
+          Informacie.commands.push(h);
+          Informacie.momentalnyStav = Informacie.commands.length;
+
       }
       Informacie.prvyVrchol = null;
       Informacie.druhyVrchol = null;
@@ -291,8 +293,6 @@ export class AppComponent implements OnInit {
   redoMetoda():void{
     this.disableUndo=false;
     Informacie.plocha.forEachObject(function(obj){
-      console.log(obj.toString());
-      console.log("meno" + obj.name);
       if(obj.type == "multipol4"){
         const lave = obj.left;
         const horne = obj.top;
@@ -356,20 +356,6 @@ export class AppComponent implements OnInit {
 
   }
 
-
-  clear():void{   //tu este doplnit ze sa unexucutuju veci co su na ploche, mozno vymazat toto este si to rozmyslim
-    const clearCommand = new ClearCommand(this.canvas,0);
-    this.disableRedo.redo=true;
-    this.disableUndo=false;
-    while(Informacie.commands.length>Informacie.momentalnyStav){
-      Informacie.commands.pop();
-    }
-    Informacie.commands.push(clearCommand);
-    clearCommand.execute();
-    Informacie.momentalnyStav++;
-
-
-  }
 
   //pomocna funkcia ktora prida multipol s 5 vytrcajucimi hranami
   addMultipol5():void{

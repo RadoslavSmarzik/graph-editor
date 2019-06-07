@@ -13,13 +13,9 @@ export class HranaCommand implements Command{
 
 
   constructor(prvy,druhy,c){
-
     this.prvy=prvy;
     this.druhy=druhy;
-
     this.hranaJS = {first:prvy.reprezentaciaJS, second:druhy.reprezentaciaJS};
-    console.log(this.hranaJS);
-    console.log(JSON.stringify(this.hranaJS));
 
   }
 
