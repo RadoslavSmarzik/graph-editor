@@ -15,8 +15,8 @@ export class Multipol2Command implements Command{
 
   constructor(meno,fake1meno,fake2meno,type){
     this.multipolJS={
-      name:type,
-      id:meno,
+      "name":type,
+      "id":meno.toString(),
     };
 
     this.meno = meno;
@@ -37,6 +37,10 @@ export class Multipol2Command implements Command{
       top: stredKruh.top+27,
       fill:"transparent"
     });
+
+    if(this.meno/10 >=1){
+      text.set("left",stredKruh.left+32);
+    }
 
     this.multipol = new fabric.Group();
     this.multipol.addWithUpdate(stredKruh);
@@ -141,8 +145,8 @@ export class Multipol2Command implements Command{
       this.array[i].set("typ_multipola","multipol2");
     }
 
-    let fake1JS = {type:"multipol",id:this.meno,dangling_edge:this.fake1.name};
-    let fake2JS = {type:"multipol",id:this.meno,dangling_edge:this.fake2.name};
+    let fake1JS = {"type":"multipol","id":this.meno.toString(),"dangling_edge":this.fake1.name};
+    let fake2JS = {"type":"multipol","id":this.meno.toString(),"dangling_edge":this.fake2.name};
 
 
     this.fake1.set("reprezentaciaJS",fake1JS);

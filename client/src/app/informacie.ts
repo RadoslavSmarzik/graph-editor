@@ -11,11 +11,12 @@ export class Informacie {
   static poleMultipolov: any;                //pole do ktoreho ukladam objekty multipolov
   static multipolyVGrafe:Array<any>;         //pole multipolov reprezentujucich ako jsony
   static hranyVGrafe:Array<any>;             //pole hran reprezentujucich ako jsony
-  static vrcholyVGrafe:Array<number>;        //pole vrcholov reprezentujucich ako jsony
+  static vrcholyVGrafe:Array<any>;        //pole vrcholov reprezentujucich ako jsony
   static multipolyNaPouzitie:Array<any>;     //pole multipolov ktore dostanem od servera
   static  aktualneViditelneMeno:any;
   static redoBooelan: any;
   static vizitka: any;
+  static kodGrafu:any;                     //kod grafu ktory budem dostavat
 
 
 }

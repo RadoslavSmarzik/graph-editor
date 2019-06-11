@@ -12,11 +12,15 @@
     <li><button (click)="vypisVrcholy()" hidden>VYPIS VRCHOLY</button></li>
     <li><button (click)="vypisHrany()" hidden>VYPIS HRANY</button></li>
     <li><button (click)="vypis_multipoly()" hidden>VYPIS MULTIPOLY</button></li>
-    <li><button (click)="calculate()">SEND GRAPH</button></li>
+    <li><button (click)="graph()">SEND GRAPH</button></li>
+    <li><button (click)="graph_code()" [disabled]="disableCode">SHOW GRAPH CODE</button></li>
+    <li><button (click)="copy_code()" [disabled]="disableCode">COPY GRAPH CODE</button></li>
+    <li><button (click)="download('graph.txt','text/plain')" [disabled]="disableCode">DOWNLOAD CODE</button></li>
+    <li><button (click)="get_invariants()" [disabled]="disableCode">INVARIANTS</button></li>
     <li><button (click)="skusam_get()" hidden>skusam_get</button></li>
     <li><button (click)="skusam_post()" hidden>skusam_post</button></li>
     <li><button (click)="zmaz_vsetko()" hidden>DELETE ALL</button></li>
-    <li><button [disabled]="disableGet" (click)="get_multipoles_fake()">GET MULTIPOLES</button></li>
+    <li><button [disabled]="disableGet" (click)="get_multipoles()">GET MULTIPOLES</button></li>
     <li><button class="multipoly" (click)="add_multipol(0)" [hidden]="hideMultipoly[0]">{{menoMultipolov[0]}}</button></li>
     <li><button class="multipoly" (click)="add_multipol(1)" [hidden]="hideMultipoly[1]">{{menoMultipolov[1]}}</button></li>
     <li><button class="multipoly" (click)="add_multipol(2)" [hidden]="hideMultipoly[2]">{{menoMultipolov[2]}}</button></li>

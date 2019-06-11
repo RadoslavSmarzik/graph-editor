@@ -1,4 +1,4 @@
-CFLAGS = -std=c++17 -fconcepts -IC:\Users\Filip\Desktop\roc_projekt\Server\relatko-ba-graph-18e177c48b16\include
+CFLAGS = -std=c++17 -fconcepts -I/home/rado/WebstormProjects/Server/relatko-ba-graph-18e177c48b16/include
 #LDFLAGS = -lcryptominisat5
 LDFLAGS =
 DBGFLAGS = -g -O0 -pedantic -Wall -Wextra -DBA_GRAPH_DEBUG

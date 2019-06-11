@@ -13,7 +13,7 @@ export class VrcholCommand implements Command{
 
   constructor(c,meno){
     this.meno=meno;
-    this.vrcholJS = { type:"vertex", id:meno};
+    this.vrcholJS = { "type":"vertex", "id":meno.toString()};
     this.plocha=c;
     this.vrchol = new fabric.Circle({
       radius:30,
@@ -31,6 +31,10 @@ export class VrcholCommand implements Command{
                                             top: this.vrchol.top+7,
                                             fill:"transparent"
     });
+    if(this.meno/10 >=1){
+      console.log(this.meno/10);
+      this.text.set("left",this.vrchol.left+12);
+    }
 
 
 
@@ -63,7 +67,7 @@ export class VrcholCommand implements Command{
   execute() {
     this.plocha.add(this.group);
     this.plocha.moveTo(this.group, 100);
-    Informacie.vrcholyVGrafe.push(this.meno);
+    Informacie.vrcholyVGrafe.push(this.meno.toString());
 
   }
 

@@ -8,6 +8,7 @@ import {Multipol3Command} from './Commandy/multipol3-command';
 import {Multipol2Command} from './Commandy/multipol2-command';
 import * as $ from 'jquery';
 import {Multipol5Command} from './Commandy/multipol5-command';
+import {Alert} from 'selenium-webdriver';
 
 
 @Component({
@@ -26,12 +27,14 @@ export class AppComponent implements OnInit {
   disableGet:Boolean;
   hideMultipoly:Array<Boolean>;
   menoMultipolov:Array<any>;
+  disableCode:Boolean;
 
 
 
 
   ngOnInit(): void {
     //inicializacia
+    this.disableCode=true;
     this.cisloVrchola = 1;
     this.multipolmeno=1;
     Informacie.multipolyNaPouzitie = [];
@@ -51,6 +54,7 @@ export class AppComponent implements OnInit {
     Informacie.hranyVGrafe = new Array();
     Informacie.vrcholyVGrafe = new Array<number>();
     Informacie.aktualneViditelneMeno = null;
+    Informacie.kodGrafu  = null;
     this.hideMultipoly=[];
     this.menoMultipolov=[];
     this.disableGet = false;
@@ -217,6 +221,11 @@ export class AppComponent implements OnInit {
     console.log(udaje);
 
     $.post(url, udaje,function(data, status){
+      let result = "";
+      $.each(data, function(k, v) {
+        result += k.toUpperCase() + ": " + v + "\n";
+      });
+      alert(result);
       console.log("dostal som " +JSON.stringify(data));
       alert("Data: "+data+" status: "+status);
     });
@@ -237,19 +246,7 @@ export class AppComponent implements OnInit {
   }
 
 
-  //funkcia, ktora bude serveruposielat vsetky hrany, vrcholy a multipoly v grafe ako jeden velky json, tu este neviem co konkretne budem spracovavat od neho ze ake vsetky vypocty mi posle
-  calculate(){
-    const url="http://localhost:8080/graph";
-    let udaje = {vertices:Informacie.vrcholyVGrafe,multipoles:Informacie.multipolyVGrafe,edges:Informacie.hranyVGrafe};
-    console.log(udaje);
 
-    $.post(url, udaje,function(data, status){
-      console.log("dostal som " +JSON.stringify(data));
-      alert("Data: "+data+" status: "+status);
-    });
-
-
-  }
 
 
  //pridanie vrchola na plochu
@@ -264,6 +261,7 @@ export class AppComponent implements OnInit {
     command.execute();
     Informacie.momentalnyStav=Informacie.commands.length;
     this.cisloVrchola++;
+    this.disableCode=true;
 
   }
   //zmaze uplne vsetko, nejde undo
@@ -273,7 +271,10 @@ export class AppComponent implements OnInit {
     Informacie.vrcholyVGrafe=[];
     Informacie.hranyVGrafe=[];
     Informacie.momentalnyStav = 0;
+    this.multipolmeno=1;
+    this.cisloVrchola=1;
     this.disableUndo=true;
+    this.disableCode=true;
   }
 
 
@@ -285,6 +286,7 @@ export class AppComponent implements OnInit {
     if(Informacie.momentalnyStav==0){
       this.disableUndo=true;
     }
+    this.disableCode=true;
 
 
   }
@@ -353,6 +355,7 @@ export class AppComponent implements OnInit {
     if(Informacie.momentalnyStav==Informacie.commands.length){
       this.disableRedo.redo=true;
     }
+    this.disableCode=true;
 
   }
 
@@ -369,6 +372,7 @@ export class AppComponent implements OnInit {
     multipol5.execute();
     Informacie.commands.push(multipol5);
     Informacie.momentalnyStav=Informacie.commands.length;
+    this.disableCode=true;
   }
 //pomocna funkcia ktora prida multipol so 4 vytrcajucimi hranami
 addMultipol4():void{
@@ -382,6 +386,7 @@ addMultipol4():void{
     multipol4.execute();
   Informacie.commands.push(multipol4);
   Informacie.momentalnyStav=Informacie.commands.length;
+  this.disableCode=true;
 }
 //pomocna funkcia ktora prida multipol s 3 vytrcajucimi hranami
   addMultipol3():void{
@@ -395,6 +400,7 @@ addMultipol4():void{
     multipol3.execute();
     Informacie.commands.push(multipol3);
     Informacie.momentalnyStav=Informacie.commands.length;
+    this.disableCode=true;
   }
 //pomocna funkcia ktora prida multipol s 2 vytrcajucimi hranami
   addMultipol2():void{
@@ -408,7 +414,7 @@ addMultipol4():void{
     multipol2.execute();
     Informacie.commands.push(multipol2);
     Informacie.momentalnyStav=Informacie.commands.length;
-
+    this.disableCode=true;
   }
 
 
@@ -447,8 +453,16 @@ addMultipol4():void{
     multipol.execute();
     Informacie.commands.push(multipol);
     Informacie.momentalnyStav=Informacie.commands.length;
+    this.disableCode=true;
 
   }
+
+  //zobrazenie kodu grafu
+  graph_code(){
+    alert(Informacie.kodGrafu);
+  }
+
+  //Funkcie na komunikaciu so serverom
 
  //funkcia ktora zo servera vypyta pole multipolov a tieto multipoly si globalne ulozi, buttony ktore bude vyuzivat zmeni na viditelne a nastavi im mena podla polzky name
   get_multipoles(){
@@ -471,6 +485,53 @@ addMultipol4():void{
 
 
   }
+
+  //funkcia, ktora bude serveru posielat vsetky hrany, vrcholy a multipoly v grafe a dostane od servera sparse6 kod grafu
+  graph(){
+    const url="http://localhost:8080/graph";
+    let udaje = {"vertices":Informacie.vrcholyVGrafe,"multipoles":Informacie.multipolyVGrafe,"edges":Informacie.hranyVGrafe};
+
+
+    $.post(url, udaje,function(data, status){
+      Informacie.kodGrafu = data;
+    });
+    this.disableCode=false;
+
+  }
+
+  //funkcia ktora vypise vsetky invarianty ziskane od servera
+  get_invariants(){
+    const url="http://localhost:8080/invariants";
+    let udaje = Informacie.kodGrafu;
+
+
+    $.get(url, udaje,function(data, status){
+      let result = "";
+      $.each(data, function(k, v) {
+        result += k + ": " + v + "\n";
+      });
+      alert(result);
+    });
+    this.disableCode=false;
+
+  }
+
+  //funkcia aby sa nam nakopiroval kod grafu
+  copy_code(){
+      let selBox = document.createElement('textarea');
+      selBox.style.position = 'fixed';
+      selBox.style.left = '0';
+      selBox.style.top = '0';
+      selBox.style.opacity = '0';
+      selBox.value = Informacie.kodGrafu;
+      document.body.appendChild(selBox);
+      selBox.focus();
+      selBox.select();
+      document.execCommand('copy');
+      document.body.removeChild(selBox);
+
+  }
+
 //tu len skusam to co dostanem od servera ci to viem spracovat, len to co vlastne ocakavam ze dostanem od servera
   get_multipoles_fake(){
 
@@ -497,6 +558,44 @@ addMultipol4():void{
     this.disableGet=true;
 
 
+  }
+//skusam ako by mohlo vizerat get invariants
+  get_invariants_skusam(){
+    const url="https://jsonplaceholder.typicode.com/posts";
+    let udaje = Informacie.kodGrafu;
+    console.log(udaje);
+
+    $.get(url, udaje,function(data, status){
+      let result = "";
+      $.each(data[5], function(k, v) {
+        result += k.toUpperCase() + ": " + v + "\n";
+      });
+      alert(result);
+    });
+    this.disableCode=false;
+    Informacie.kodGrafu="tu by mal byt kod grafu";
+
+  }
+
+
+  // Function to download data to a file
+  download(filename, type) {
+    let data = Informacie.kodGrafu;
+    var file = new Blob([data], {type: type});
+    if (window.navigator.msSaveOrOpenBlob) // IE10+
+      window.navigator.msSaveOrOpenBlob(file, filename);
+    else { // Others
+      var a = document.createElement("a"),
+        url = URL.createObjectURL(file);
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(function() {
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      }, 0);
+    }
   }
 
 
