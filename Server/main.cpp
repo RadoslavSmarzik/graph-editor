@@ -30,6 +30,7 @@
 #include <sys/socket.h> 
 #include <stdlib.h> 
 #include <netinet/in.h> 
+#include <map>
 #include <string.h> 
 #include <iostream> 
 
@@ -49,7 +50,7 @@ json datab_mult(){
 
 int main(int argc, char const *argv[]) {
 	Graph gr=create_isaacs(11);            //pouzivanie na skusku nieco z ba_graphu
-	std::cout << max_deg(gr) << std::endl;
+	std::cout << max_deg(gr) << std::endl;//
 	
     int server_fd, new_socket, valread;
     struct sockaddr_in address;
@@ -78,7 +79,7 @@ int main(int argc, char const *argv[]) {
         exit(EXIT_FAILURE);
     }
 	
-    //while(1){ // 
+   //while(1){ // 
 
     if ((new_socket = accept(server_fd, (struct sockaddr *) &address,
             (socklen_t*) & addrlen)) < 0) {
@@ -104,75 +105,114 @@ int main(int argc, char const *argv[]) {
 	if(request.method == "POST"){
 		if(request.uri.compare(0,6,"/graph")==0){
 			json m = datab_mult();
-			Graph g = createG();
+			map<pair<int, int>, int> map;
+			int	c = 0;		
+			/*Graph g = createG();
 		
 			for (auto& e : inf["vertices"]) {
-				addV(g, e);
+				c++;
+				map[{ 0, e }] = c;
+				addV(g, c);
 			}
 			for (auto& e : inf["edges"]) {
-				if(e["first"]["type"]=="multipol" && e["second"]["type"]=="vertex"){
+				if(e["first"]["type"] == "multipol" && e["second"]["type"] == "vertex"){
 					for (auto& j : inf["multipoles"]) {
 						if(j["id"] == e["first"]["id"]){
 							for (auto& k : m) {
 								if(j["name"] == k["name"]){
-								
-									//addE(k["dangling_edges_mapping"][e["first"]["dangling_edge"]], e["second"]["id"]);							
+									for (auto& l : k["dangling_edges_mapping"]) {
+										if(l[e["first"]["dangling_edge"]] != nullptr){
+											if(map[{ j["id"], l[e["first"]["dangling_edge"]] }] == 0){
+												c++;
+												map[{ j["id"], l[e["first"]["dangling_edge"]] }] = c;
+											}	
+											//addE(k["dangling_edges_mapping"][e["first"]["dangling_edge"]], e["second"]["id"]);
+											break;
+										}	
+									}
 									break;
 								}	
 							}
 							break;
 						}
 					}									
-				}else if(e["second"]["type"]=="multipol" && e["first"]["type"]=="vertex"){
+				}else if(e["second"]["type"] == "multipol" && e["first"]["type"] == "vertex"){
 					for (auto& j : inf["multipoles"]) {
 						if(j["id"] == e["second"]["id"]){
 							for (auto& k : m) {
 								if(j["name"] == k["name"]){
-								
-									//addE(k["dangling_edges_mapping"][e["second"]["dangling_edge"]], e["first"]["id"]);							
+									for (auto& l : k["dangling_edges_mapping"]) {
+										if(l[e["second"]["dangling_edge"]] != nullptr){
+											if(map[{ j["id"], l[e["second"]["dangling_edge"]] }] == 0){
+												c++;
+												map[{ j["id"], l[e["second"]["dangling_edge"]] }] = c;
+											}	
+											//addE(k["dangling_edges_mapping"][e["first"]["dangling_edge"]], e["second"]["id"]);
+											break;
+										}	
+									}							
 									break;
 								}	
 							}
 							break;
 						}
 					}					
-				}else if(e["first"]["type"]=="multipol" && e["second"]["type"]=="multipol"){
+				}else if(e["first"]["type"] == "multipol" && e["second"]["type"] == "multipol"){
 					int num = 0;
+					int v1, v2, id1, id2;
 					for (auto& j : inf["multipoles"]) {
 						if(j["id"] == e["first"]["id"]){
 							for (auto& k : m) {
 								if(j["name"] == k["name"]){
-								
-									//=k["dangling_edges_mapping"][e["first"]["dangling_edge"]];//premenna
-									num++;
+									for (auto& l : k["dangling_edges_mapping"]) {
+										if(l[e["first"]["dangling_edge"]] != nullptr){
+											id1 = j["id"];
+											v1 = l[e["first"]["dangling_edge"]];
+											num++;
+											break;
+										}	
+									}
 									break;
 								}	
 							}	
 						}else if(j["id"] == e["second"]["id"]){									//nemam osetrene ze sa multipol spoji sam so sebou
 							for (auto& k : m) {
 								if(j["name"] == k["name"]){
-								
-									//=k["dangling_edges_mapping"][e["second"]["dangling_edge"]];  //premenna
-									num++;
+									for (auto& l : k["dangling_edges_mapping"]) {
+										if(l[e["second"]["dangling_edge"]] != nullptr){
+											id2 = j["id"];
+											v2 = l[e["second"]["dangling_edge"]];
+											num++;
+											break;
+										}	
+									}
 									break;
 								}	
 							}
 						}
 						if(num==2){
+							if(map[{ id1, v1 }] == 0){
+								c++;
+								map[{ id1, v1 }] = c;
+							}
+							if(map[{ id2, v2 }] == 0){
+								c++;
+								map[{ id2, v2 }] = c;
+							}
 							break;
 						}	
 					}	
-					add;
+					//add();
 							
-				}else if(e["first"]["type"]=="vertex" && e["second"]["type"]=="vertex"){
-					addE(g, Location(e["first"]["id"], e["second"]["id"]));
+				}else if(e["first"]["type"] == "vertex" && e["second"]["type"] == "vertex"){
+					addE(g, Location(map[{ 0, e["first"]["id"] }], map[{ 0, e["second"]["id"] }]));						
 				}else{	
 					string str="HTTPS/1.1 404 NOT FOUND\nContent-Type: text/html\n\n<html><body>NOT FOUND</body></html>";
 					const char * resp = str.c_str();
 					send(new_socket, resp, strlen(resp), 0);			
 				}
 			}				
-			write_sparse6(g);
+			//write_sparse6(g);*/
 		
 			string str="HTTPS/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
 			const char * resp = str.c_str();

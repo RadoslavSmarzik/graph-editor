@@ -1,0 +1,79 @@
+{
+  "vertices": [
+    "1"
+  ],
+  "multipoles": [
+    {
+      "name": "negator_Pg",
+      "id": "1"
+    },
+    {
+      "name": "isochromatic_Pg",
+      "id": "2"
+    },
+    {
+      "name": "(2,3)-pole_Pg",
+      "id": "3"
+    }
+  ],
+  "edges": [
+    {
+      "first": {
+        "type": "multipol",
+        "id": "2",
+        "dangling_edge": "i1"
+      },
+      "second": {
+        "type": "multipol",
+        "id": "1",
+        "dangling_edge": "o1"
+      }
+    },
+    {
+      "first": {
+        "type": "multipol",
+        "id": "1",
+        "dangling_edge": "i2"
+      },
+      "second": {
+        "type": "multipol",
+        "id": "3",
+        "dangling_edge": "o3"
+      }
+    },
+    {
+      "first": {
+        "type": "multipol",
+        "id": "3",
+        "dangling_edge": "o2"
+      },
+      "second": {
+        "type": "multipol",
+        "id": "2",
+        "dangling_edge": "i2"
+      }
+    },
+    {
+      "first": {
+        "type": "vertex",
+        "id": "1"
+      },
+      "second": {
+        "type": "multipol",
+        "id": "3",
+        "dangling_edge": "i1"
+      }
+    },
+    {
+      "first": {
+        "type": "vertex",
+        "id": "1"
+      },
+      "second": {
+        "type": "multipol",
+        "id": "1",
+        "dangling_edge": "i1"
+      }
+    }
+  ]
+}

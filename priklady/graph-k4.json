@@ -1,0 +1,71 @@
+{
+  "vertices": [
+    "1",
+    "2",
+    "3",
+    "4"
+  ],
+  "multipoles": [],
+  "edges": [
+    {
+      "first": {
+        "type": "vertex",
+        "id": "1"
+      },
+      "second": {
+        "type": "vertex",
+        "id": "2"
+      }
+    },
+    {
+      "first": {
+        "type": "vertex",
+        "id": "1"
+      },
+      "second": {
+        "type": "vertex",
+        "id": "3"
+      }
+    },
+    {
+      "first": {
+        "type": "vertex",
+        "id": "3"
+      },
+      "second": {
+        "type": "vertex",
+        "id": "2"
+      }
+    },
+    {
+      "first": {
+        "type": "vertex",
+        "id": "1"
+      },
+      "second": {
+        "type": "vertex",
+        "id": "4"
+      }
+    },
+    {
+      "first": {
+        "type": "vertex",
+        "id": "4"
+      },
+      "second": {
+        "type": "vertex",
+        "id": "3"
+      }
+    },
+    {
+      "first": {
+        "type": "vertex",
+        "id": "4"
+      },
+      "second": {
+        "type": "vertex",
+        "id": "2"
+      }
+    }
+  ]
+}
