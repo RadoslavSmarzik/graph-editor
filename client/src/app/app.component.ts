@@ -28,6 +28,9 @@ export class AppComponent implements OnInit {
   hideMultipoly:Array<Boolean>;
   menoMultipolov:Array<any>;
   disableCode:Boolean;
+  hideMultipoles:any;
+  nameMultipoles:any;
+  innerHtml:any;
 
 
 
@@ -40,6 +43,26 @@ export class AppComponent implements OnInit {
     Informacie.multipolyNaPouzitie = [];
     Informacie.redoBooelan = {redo:true};
     this.disableRedo=Informacie.redoBooelan;
+    Informacie.codeDisable={disable:true};
+    this.disableCode=Informacie.codeDisable;   //uvideme ako ide
+
+
+
+
+    Informacie.multipolesNames=[];
+
+
+    Informacie.hiddenBoolean=[];
+    for(let i=0;i<5;i++){
+      let hidden = {hidden:true};
+      let name = {name:""};
+      Informacie.multipolesNames.push(name);
+      Informacie.hiddenBoolean.push(hidden);
+    }
+    this.nameMultipoles=Informacie.multipolesNames;
+    this.hideMultipoles=Informacie.hiddenBoolean;
+
+
     this.canvas = new fabric.Canvas('myCanvas');
     this.disableStart = false;
     this.disableStop = true;
@@ -64,6 +87,7 @@ export class AppComponent implements OnInit {
       this.hideMultipoly.push(true);
     }
 
+    this.get_multipoles();
 
     //nastavenie selektovania objektov na ploche, ked selektnem 2 vrcholy alebo 2 dagling_edge(alebo vrchol a dagling_edge) hned za sebou tak sa vytvori hrana
     this.canvas.on("object:selected", function (e) {
@@ -228,6 +252,11 @@ export class AppComponent implements OnInit {
       alert(result);
       console.log("dostal som " +JSON.stringify(data));
       alert("Data: "+data+" status: "+status);
+      console.log("status je "+status);
+      Informacie.multipolesNames[0].name=data["id"];
+      Informacie.hiddenBoolean[0].hidden = false;
+      Informacie.codeDisable.disable=false;
+      Informacie.kodGrafu="kod grafu tu";
     });
   }
   vypisHrany() {
@@ -471,17 +500,23 @@ addMultipol4():void{
 
       for(let i=0;i<data.length;i++){
         let pole = [];
-        pole.push(data[i].name);
-        pole.push(data[i].dangling_edges);
+        pole.push(data[i]["name"]);
+        pole.push(data[i]["dangling_edges[]"]);
         Informacie.multipolyNaPouzitie.push(pole);
       }
 
-    });
-    for(let i=0;i<Informacie.multipolyNaPouzitie.length;i++){
-      this.menoMultipolov[i]=Informacie.multipolyNaPouzitie[i][0];
-      this.hideMultipoly[i]=false;
-    }
-    this.disableGet=true;
+      for(let i=0;i<Informacie.multipolyNaPouzitie.length;i++){
+        Informacie.multipolesNames[i].name=Informacie.multipolyNaPouzitie[i][0];
+        Informacie.hiddenBoolean.hidden=false;
+      }
+
+
+    })
+
+      .fail(function() {
+        alert( "Try refresh" );
+      })
+    ;
 
 
   }
@@ -494,8 +529,12 @@ addMultipol4():void{
 
     $.post(url, udaje,function(data, status){
       Informacie.kodGrafu = data;
+      Informacie.codeDisable.disable=false;
+    })
+  .fail(function() {
+      alert( "error" );
     });
-    this.disableCode=false;
+
 
   }
 

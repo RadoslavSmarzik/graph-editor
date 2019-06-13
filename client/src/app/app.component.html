@@ -13,24 +13,29 @@
     <li><button (click)="vypisHrany()" hidden>VYPIS HRANY</button></li>
     <li><button (click)="vypis_multipoly()" hidden>VYPIS MULTIPOLY</button></li>
     <li><button (click)="graph()">SEND GRAPH</button></li>
-    <li><button (click)="graph_code()" [disabled]="disableCode">SHOW GRAPH CODE</button></li>
-    <li><button (click)="copy_code()" [disabled]="disableCode">COPY GRAPH CODE</button></li>
-    <li><button (click)="download('graph.txt','text/plain')" [disabled]="disableCode">DOWNLOAD CODE</button></li>
-    <li><button (click)="get_invariants()" [disabled]="disableCode">INVARIANTS</button></li>
-    <li><button (click)="skusam_get()" hidden>skusam_get</button></li>
-    <li><button (click)="skusam_post()" hidden>skusam_post</button></li>
+    <li><button (click)="graph_code()" [disabled]="disableCode.disable">SHOW GRAPH CODE</button></li>
+    <li><button (click)="copy_code()" [disabled]="disableCode.disable">COPY GRAPH CODE</button></li>
+    <li><button (click)="download('graph.txt','text/plain')" [disabled]="disableCode.disable">DOWNLOAD CODE</button></li>
+    <li><button (click)="get_invariants()" [disabled]="disableCode.disable">INVARIANTS</button></li>
+    <li><button (click)="skusam_get()" >skusam_get</button></li>
+    <li><button (click)="skusam_post()" >skusam_post</button></li>
     <li><button (click)="zmaz_vsetko()" hidden>DELETE ALL</button></li>
-    <li><button [disabled]="disableGet" (click)="get_multipoles()">GET MULTIPOLES</button></li>
-    <li><button class="multipoly" (click)="add_multipol(0)" [hidden]="hideMultipoly[0]">{{menoMultipolov[0]}}</button></li>
-    <li><button class="multipoly" (click)="add_multipol(1)" [hidden]="hideMultipoly[1]">{{menoMultipolov[1]}}</button></li>
-    <li><button class="multipoly" (click)="add_multipol(2)" [hidden]="hideMultipoly[2]">{{menoMultipolov[2]}}</button></li>
-    <li><button class="multipoly" (click)="add_multipol(3)" [hidden]="hideMultipoly[3]">{{menoMultipolov[3]}}</button></li>
-    <li><button class="multipoly" (click)="add_multipol(4)" [hidden]="hideMultipoly[4]">{{menoMultipolov[4]}}</button></li>
+    <li><button [disabled]="disableGet" (click)="get_multipoles()" hidden>GET MULTIPOLES</button></li>
+    <li><button class="multipoly" (click)="add_multipol(0)" [hidden]="hideMultipoles[0].hidden">{{nameMultipoles[0].name}}</button></li>
+    <li><button class="multipoly" (click)="add_multipol(1)" [hidden]="hideMultipoles[1].hidden">{{nameMultipoles[1].name}}</button></li>
+    <li><button class="multipoly" (click)="add_multipol(2)" [hidden]="hideMultipoles[2].hidden">{{nameMultipoles[2].name}}</button></li>
+    <li><button class="multipoly" (click)="add_multipol(3)" [hidden]="hideMultipoles[3].hidden">{{nameMultipoles[3].name}}</button></li>
+    <li><button class="multipoly" (click)="add_multipol(4)" [hidden]="hideMultipoles[4].hidden">{{nameMultipoles[4].name}}</button></li>
+    <br>
+    <br>
+    <br>
     <li><button (click)="undoMetoda()" [disabled]="disableUndo" >UNDO</button></li>
     <li><button (click)="redoMetoda()" [disabled]="disableRedo.redo">REDO</button></li>
 
 
    </ul>
+
    <canvas width="1600" height="800" id="myCanvas"></canvas>
+
  </div>
 

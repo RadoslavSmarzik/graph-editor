@@ -17,6 +17,9 @@ export class Informacie {
   static redoBooelan: any;
   static vizitka: any;
   static kodGrafu:any;                     //kod grafu ktory budem dostavat
+  static hiddenBoolean:any;
+  static multipolesNames:any;
+  static codeDisable:any;
 
 
 }
