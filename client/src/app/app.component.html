@@ -4,6 +4,11 @@
   <ul class ="inner">
 
      <li><button (click)="pridajVrchol()">VERTEX</button></li>
+    <li><button class="multipoly" (click)="add_multipol(0)" [hidden]="hideMultipoles[0].hidden">{{nameMultipoles[0].name}}</button></li>
+    <li><button class="multipoly" (click)="add_multipol(1)" [hidden]="hideMultipoles[1].hidden">{{nameMultipoles[1].name}}</button></li>
+    <li><button class="multipoly" (click)="add_multipol(2)" [hidden]="hideMultipoles[2].hidden">{{nameMultipoles[2].name}}</button></li>
+    <li><button class="multipoly" (click)="add_multipol(3)" [hidden]="hideMultipoles[3].hidden">{{nameMultipoles[3].name}}</button></li>
+    <li><button class="multipoly" (click)="add_multipol(4)" [hidden]="hideMultipoles[4].hidden">{{nameMultipoles[4].name}}</button></li>
     <li><button (click)="addMultipol5()" hidden>MULTIPOL5</button></li>
       <li><button (click)="addMultipol4()" hidden>MULTIPOL4</button></li>
       <li><button (click)="addMultipol3()" hidden>MULTIPOL3</button></li>
@@ -21,11 +26,7 @@
     <li><button (click)="skusam_post()" >skusam_post</button></li>
     <li><button (click)="zmaz_vsetko()" hidden>DELETE ALL</button></li>
     <li><button [disabled]="disableGet" (click)="get_multipoles()" hidden>GET MULTIPOLES</button></li>
-    <li><button class="multipoly" (click)="add_multipol(0)" [hidden]="hideMultipoles[0].hidden">{{nameMultipoles[0].name}}</button></li>
-    <li><button class="multipoly" (click)="add_multipol(1)" [hidden]="hideMultipoles[1].hidden">{{nameMultipoles[1].name}}</button></li>
-    <li><button class="multipoly" (click)="add_multipol(2)" [hidden]="hideMultipoles[2].hidden">{{nameMultipoles[2].name}}</button></li>
-    <li><button class="multipoly" (click)="add_multipol(3)" [hidden]="hideMultipoles[3].hidden">{{nameMultipoles[3].name}}</button></li>
-    <li><button class="multipoly" (click)="add_multipol(4)" [hidden]="hideMultipoles[4].hidden">{{nameMultipoles[4].name}}</button></li>
+
     <br>
     <br>
     <br>

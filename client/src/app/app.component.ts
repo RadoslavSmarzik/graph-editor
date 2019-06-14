@@ -37,7 +37,6 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     //inicializacia
-    this.disableCode=true;
     this.cisloVrchola = 1;
     this.multipolmeno=1;
     Informacie.multipolyNaPouzitie = [];
@@ -87,8 +86,8 @@ export class AppComponent implements OnInit {
       this.hideMultipoly.push(true);
     }
 
-    this.get_multipoles();
 
+    this.get_multipoles();
     //nastavenie selektovania objektov na ploche, ked selektnem 2 vrcholy alebo 2 dagling_edge(alebo vrchol a dagling_edge) hned za sebou tak sa vytvori hrana
     this.canvas.on("object:selected", function (e) {
         Informacie.selectedVrchol = e.target;
@@ -243,7 +242,7 @@ export class AppComponent implements OnInit {
     const url="https://jsonplaceholder.typicode.com/posts";
     let udaje = {vertices:Informacie.vrcholyVGrafe,multipoles:Informacie.multipolyVGrafe,edges:Informacie.hranyVGrafe};
     console.log(udaje);
-
+    confirm("agaga");
     $.post(url, udaje,function(data, status){
       let result = "";
       $.each(data, function(k, v) {
@@ -290,7 +289,7 @@ export class AppComponent implements OnInit {
     command.execute();
     Informacie.momentalnyStav=Informacie.commands.length;
     this.cisloVrchola++;
-    this.disableCode=true;
+    Informacie.codeDisable.disable=true;
 
   }
   //zmaze uplne vsetko, nejde undo
@@ -303,7 +302,7 @@ export class AppComponent implements OnInit {
     this.multipolmeno=1;
     this.cisloVrchola=1;
     this.disableUndo=true;
-    this.disableCode=true;
+    Informacie.codeDisable.disable=true;
   }
 
 
@@ -315,7 +314,7 @@ export class AppComponent implements OnInit {
     if(Informacie.momentalnyStav==0){
       this.disableUndo=true;
     }
-    this.disableCode=true;
+    Informacie.codeDisable.disable=true;
 
 
   }
@@ -384,7 +383,7 @@ export class AppComponent implements OnInit {
     if(Informacie.momentalnyStav==Informacie.commands.length){
       this.disableRedo.redo=true;
     }
-    this.disableCode=true;
+    Informacie.codeDisable.disable=true;
 
   }
 
@@ -401,7 +400,7 @@ export class AppComponent implements OnInit {
     multipol5.execute();
     Informacie.commands.push(multipol5);
     Informacie.momentalnyStav=Informacie.commands.length;
-    this.disableCode=true;
+    Informacie.codeDisable.disable=true;
   }
 //pomocna funkcia ktora prida multipol so 4 vytrcajucimi hranami
 addMultipol4():void{
@@ -415,7 +414,7 @@ addMultipol4():void{
     multipol4.execute();
   Informacie.commands.push(multipol4);
   Informacie.momentalnyStav=Informacie.commands.length;
-  this.disableCode=true;
+  Informacie.codeDisable.disable=true;
 }
 //pomocna funkcia ktora prida multipol s 3 vytrcajucimi hranami
   addMultipol3():void{
@@ -429,7 +428,7 @@ addMultipol4():void{
     multipol3.execute();
     Informacie.commands.push(multipol3);
     Informacie.momentalnyStav=Informacie.commands.length;
-    this.disableCode=true;
+    Informacie.codeDisable.disable=true;
   }
 //pomocna funkcia ktora prida multipol s 2 vytrcajucimi hranami
   addMultipol2():void{
@@ -443,7 +442,7 @@ addMultipol4():void{
     multipol2.execute();
     Informacie.commands.push(multipol2);
     Informacie.momentalnyStav=Informacie.commands.length;
-    this.disableCode=true;
+    Informacie.codeDisable.disable=true;
   }
 
 
@@ -482,7 +481,7 @@ addMultipol4():void{
     multipol.execute();
     Informacie.commands.push(multipol);
     Informacie.momentalnyStav=Informacie.commands.length;
-    this.disableCode=true;
+    Informacie.codeDisable.disable=true;
 
   }
 
@@ -497,19 +496,23 @@ addMultipol4():void{
   get_multipoles(){
     const url = "http://localhost:8080/multipol";
     $.get(url,function(data, status){
+      if(status="success") {
+        for (let i = 0; i < data.length; i++) {
+          let pole = [];
+          pole.push(data[i]["name"]);
+          pole.push(data[i]["dangling_edges"]); //mozno dangling_edges
+          Informacie.multipolyNaPouzitie.push(pole);
+        }
 
-      for(let i=0;i<data.length;i++){
-        let pole = [];
-        pole.push(data[i]["name"]);
-        pole.push(data[i]["dangling_edges[]"]);
-        Informacie.multipolyNaPouzitie.push(pole);
+
+        for (let i = 0; i < Informacie.multipolyNaPouzitie.length; i++) {
+          Informacie.multipolesNames[i].name = Informacie.multipolyNaPouzitie[i][0];
+          Informacie.hiddenBoolean[i].hidden = false;
+        }
       }
-
-      for(let i=0;i<Informacie.multipolyNaPouzitie.length;i++){
-        Informacie.multipolesNames[i].name=Informacie.multipolyNaPouzitie[i][0];
-        Informacie.hiddenBoolean.hidden=false;
+      else{
+        alert("error");
       }
-
 
     })
 
@@ -528,8 +531,10 @@ addMultipol4():void{
 
 
     $.post(url, udaje,function(data, status){
-      Informacie.kodGrafu = data;
-      Informacie.codeDisable.disable=false;
+      if(status="success") {
+        Informacie.kodGrafu = data;
+        Informacie.codeDisable.disable = false;
+      }
     })
   .fail(function() {
       alert( "error" );
@@ -545,13 +550,17 @@ addMultipol4():void{
 
 
     $.get(url, udaje,function(data, status){
-      let result = "";
-      $.each(data, function(k, v) {
-        result += k + ": " + v + "\n";
+      if(status = "success") {
+        let result = "";
+        $.each(data, function (k, v) {
+          result += k + ": " + v + "\n";
+        });
+        confirm(result);
+      }
+    })
+      .fail(function() {
+        alert( "error" );
       });
-      alert(result);
-    });
-    this.disableCode=false;
 
   }
 
@@ -611,7 +620,7 @@ addMultipol4():void{
       });
       alert(result);
     });
-    this.disableCode=false;
+    Informacie.codeDisable.disable=false;
     Informacie.kodGrafu="tu by mal byt kod grafu";
 
   }
