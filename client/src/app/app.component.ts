@@ -36,6 +36,7 @@ export class AppComponent implements OnInit {
 
 
   ngOnInit(): void {
+
     //inicializacia
     this.cisloVrchola = 1;
     this.multipolmeno=1;
@@ -45,7 +46,7 @@ export class AppComponent implements OnInit {
     Informacie.codeDisable={disable:true};
     this.disableCode=Informacie.codeDisable;   //uvideme ako ide
 
-
+    this.innerHtml="<h1>ahoj</h1>";
 
 
     Informacie.multipolesNames=[];
@@ -222,6 +223,15 @@ export class AppComponent implements OnInit {
 
   //skusam get a post a funkcie na pomocne vypisovanie hran, vrcholov a multipolov na konzolu, pri odovzdavani tieto funkcie zmazem
   skusam_get(){
+    /*$("body").on( "click", ".button-container button", function(){
+      alert( "Triggred by " + $(this).text() );
+    });*/
+
+
+
+    let i=2;
+      $(".button-container").append( " <button>Button "+ i +"</button>" );
+      i++;
     const url = "https://jsonplaceholder.typicode.com/posts";
 
     $.get(url,function(data, status){

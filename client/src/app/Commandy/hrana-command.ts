@@ -41,6 +41,8 @@ export class HranaCommand implements Command{
       if(this.prvy.typ_multipola == "multipol5") {
         points.push(new fabric.Point(this.prvy.suradnicaLeft + 117.5, this.prvy.suradnicaTop + 117.5));
       }
+      let index_of_group = Informacie.poleMultipolov[this.prvy.multipol].length-1;
+      Informacie.poleMultipolov[this.prvy.multipol][0].item(0).set("fill",Informacie.poleMultipolov[this.prvy.multipol][index_of_group].farbaSpojenia);
 
     }
 
@@ -70,6 +72,8 @@ export class HranaCommand implements Command{
       if(this.druhy.typ_multipola == "multipol5") {
         points.push(new fabric.Point(this.druhy.suradnicaLeft + 117.5, this.druhy.suradnicaTop + 117.5));
       }
+      let index_of_group = Informacie.poleMultipolov[this.druhy.multipol].length-1;
+      Informacie.poleMultipolov[this.druhy.multipol][0].item(0).set("fill",Informacie.poleMultipolov[this.druhy.multipol][index_of_group].farbaSpojenia);
 
     }
     else {
