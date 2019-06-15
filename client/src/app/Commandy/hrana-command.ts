@@ -53,6 +53,51 @@ export class HranaCommand implements Command{
     Informacie.hranyVGrafe.push(this.hranaJS);
   }
 
+
+
+
+  make_vertex_moveable(vertex){
+    vertex.lockMovementX = false;
+    vertex.lockMovementY = false;
+    vertex.item(0).set("fill",vertex.zakladnaFarba);
+    vertex.set("aktualnaFarba",vertex.zakladnaFarba);
+  }
+
+  how_many_edges_from_multipol(multipol){
+    let edges=0;
+    for(let i=1;i<Informacie.poleMultipolov[multipol].length-1;i++){
+      edges+=Informacie.poleMultipolov[multipol][i].pocetHran;
+    }
+    return edges;
+
+  }
+
+  multipol_become_moveable(multipol){
+    Informacie.poleMultipolov[multipol][0].on("mousedblclick", function (options) {
+
+      for (let i = 0; i < Informacie.poleMultipolov[this.name].length - 1; i++) {
+        Informacie.plocha.remove(Informacie.poleMultipolov[this.name][i]);
+      }
+
+      let index_of_group =Informacie.poleMultipolov[this.name].length -1;
+
+      Informacie.poleMultipolov[this.name][index_of_group].set("left", this.suradnicaLeft);
+      Informacie.poleMultipolov[this.name][index_of_group].set("top", this.suradnicaTop);
+      Informacie.plocha.add(Informacie.poleMultipolov[this.name][index_of_group]);
+      Informacie.poleMultipolov[this.name][0].item(0).set("fill", Informacie.poleMultipolov[this.name][index_of_group].zakladnaFarba);
+
+      Informacie.plocha.remove(Informacie.vizitka);
+      Informacie.plocha.renderAll();
+
+
+    });
+
+
+
+  }
+
+
+
   //pridanie novej hrany, suradnice polyline sa vypocitavaju podla toho kolko ma multipol vytrcajucich hran
   execute() {
     const points = [];
@@ -101,45 +146,6 @@ export class HranaCommand implements Command{
 
   }
 
-  make_vertex_moveable(vertex){
-    vertex.lockMovementX = false;
-    vertex.lockMovementY = false;
-    vertex.item(0).set("fill",vertex.zakladnaFarba);
-    vertex.set("aktualnaFarba",vertex.zakladnaFarba);
-  }
-
-  how_many_edges_from_multipol(multipol){
-    let edges=0;
-    for(let i=1;i<Informacie.poleMultipolov[multipol].length-1;i++){
-      edges+=Informacie.poleMultipolov[multipol][i].pocetHran;
-    }
-    return edges;
-
-  }
-
-  multipol_become_moveable(multipol){
-    Informacie.poleMultipolov[multipol][0].on("mousedblclick", function (options) {
-
-      for (let i = 0; i < Informacie.poleMultipolov[this.name].length - 1; i++) {
-        Informacie.plocha.remove(Informacie.poleMultipolov[this.name][i]);
-      }
-
-      let index_of_group =Informacie.poleMultipolov[this.name].length -1;
-
-      Informacie.poleMultipolov[this.name][index_of_group].set("left", this.suradnicaLeft);
-      Informacie.poleMultipolov[this.name][index_of_group].set("top", this.suradnicaTop);
-      Informacie.plocha.add(Informacie.poleMultipolov[this.name][index_of_group]);
-      Informacie.poleMultipolov[this.name][0].item(0).set("fill", Informacie.poleMultipolov[this.name][index_of_group].zakladnaFarba);
-
-      Informacie.plocha.remove(Informacie.vizitka);
-      Informacie.plocha.renderAll();
-
-
-    });
-
-
-
-  }
 
   //odstrani hranu a podla toho kolko ma multipol este ku sebe pripojenych hran, ak tych hran je 0 tak mu nastavime to ze doubleclickom s nim mozme opat hybat
   unexecute() {

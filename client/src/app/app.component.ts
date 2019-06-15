@@ -8,7 +8,7 @@ import {Multipol3Command} from './Commandy/multipol3-command';
 import {Multipol2Command} from './Commandy/multipol2-command';
 import * as $ from 'jquery';
 import {Multipol5Command} from './Commandy/multipol5-command';
-import {Alert} from 'selenium-webdriver';
+
 
 
 @Component({
@@ -22,15 +22,12 @@ export class AppComponent implements OnInit {
   disableStop: Boolean;
   disableUndo: Boolean;
   disableRedo: any;
-  cisloVrchola: number;
+  vertexName: number;
   multipolmeno:number;
-  disableGet:Boolean;
   hideMultipoly:Array<Boolean>;
-  menoMultipolov:Array<any>;
   disableCode:Boolean;
   hideMultipoles:any;
   nameMultipoles:any;
-  innerHtml:any;
 
 
 
@@ -38,20 +35,14 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
 
     //inicializacia
-    this.cisloVrchola = 1;
+    this.vertexName = 1;
     this.multipolmeno=1;
     Informacie.multipolyNaPouzitie = [];
     Informacie.redoBooelan = {redo:true};
     this.disableRedo=Informacie.redoBooelan;
     Informacie.codeDisable={disable:true};
     this.disableCode=Informacie.codeDisable;   //uvideme ako ide
-
-    this.innerHtml="<h1>ahoj</h1>";
-
-
     Informacie.multipolesNames=[];
-
-
     Informacie.hiddenBoolean=[];
     for(let i=0;i<5;i++){
       let hidden = {hidden:true};
@@ -79,73 +70,56 @@ export class AppComponent implements OnInit {
     Informacie.aktualneViditelneMeno = null;
     Informacie.kodGrafu  = null;
     this.hideMultipoly=[];
-    this.menoMultipolov=[];
-    this.disableGet = false;
-    //najprv su buttony na multipoly, ktore pridavam z databazy skryte
-    for(let i=0;i<5;i++){
-      this.menoMultipolov.push("-----");
-      this.hideMultipoly.push(true);
-    }
+
+
 
 
     this.get_multipoles();
     //nastavenie selektovania objektov na ploche, ked selektnem 2 vrcholy alebo 2 dagling_edge(alebo vrchol a dagling_edge) hned za sebou tak sa vytvori hrana
-    this.canvas.on("object:selected", function (e) {
-        Informacie.selectedVrchol = e.target;
-      if (e.target.type == "vertex"){
-        e.target.item(0).set("fill", "#1E90FF");
-
-      }
-      if(e.target.type == "fakeVrchol"){
-        e.target.set("fill", "#1E90FF");
-      }
-      Informacie.prvyVrchol = e.target;
-    });
-
-    this.canvas.on("selection:cleared", function () {
-      if(Informacie.selectedVrchol.type == "vertex"){
-        Informacie.selectedVrchol.item(0).set("fill",Informacie.selectedVrchol.aktualnaFarba);
-      }
-      Informacie.selectedVrchol.set("fill", Informacie.selectedVrchol.zakladnaFarba);
-      Informacie.prvyVrchol = null;
-      Informacie.druhyVrchol = null;
-
-    });
+    this.set_selection_on_canvas();
 
 
-    this.canvas.on("selection:updated", function (e) {
-      if(Informacie.selectedVrchol.type == "vertex"){
-        Informacie.selectedVrchol.item(0).set("fill",Informacie.selectedVrchol.aktualnaFarba);
-      }
-      Informacie.selectedVrchol.set("fill", Informacie.selectedVrchol.zakladnaFarba);
-
-      const activeObj = e.target;
-      if(activeObj.type =="vertex") {
-        activeObj.item(0).set("fill", "#1E90FF");
-      }
-
-      Informacie.selectedVrchol = activeObj;
-
-      Informacie.druhyVrchol = e.target;
-      if ((Informacie.prvyVrchol.type == "vertex" || Informacie.prvyVrchol.type == "fakeVrchol") && (Informacie.druhyVrchol.type == "vertex" || Informacie.druhyVrchol.type == "fakeVrchol")) {
-
-          const h = new HranaCommand(Informacie.prvyVrchol, Informacie.druhyVrchol, this);
-          h.execute();
-          while (Informacie.commands.length > Informacie.momentalnyStav) {
-            Informacie.commands.pop();
-          }
-          Informacie.redoBooelan.redo = true;
-          Informacie.commands.push(h);
-          Informacie.momentalnyStav = Informacie.commands.length;
-
-      }
-      Informacie.prvyVrchol = null;
-      Informacie.druhyVrchol = null;
-      Informacie.prvyVrchol = e.target;
-
-    });
 
     //nastavovanie toho, ze ked prejdem nad nejakym objektom ukaze sa jeho meno
+    this.set_mouse_over_on_canvas();
+    this.set_mouse_out_on_canvas();
+
+
+
+
+  }
+
+
+
+  //skusam get a post a funkcie na pomocne vypisovanie hran, vrcholov a multipolov na konzolu, pri odovzdavani tieto funkcie zmazem
+
+
+  set_mouse_out_on_canvas(){
+    this.canvas.on('mouse:out', function (e) {
+      if (e.target instanceof fabric.Group) {
+        if(e.target.type=="vertex") {
+          e.target.item(1).set("fill", 'transparent');
+          this.renderAll();
+        }
+        if(e.target.type == "multipol"){
+          e.target.item(1).set("fill", "transparent");
+          this.renderAll();
+        }
+        /*if(e.target.type == "multipol4" || e.target.type == "multipol3" || e.target.type == "multipol2" || e.target.type == "multipol5"){
+          e.target.item(0).item(1).set("fill", "transparent");
+          this.renderAll();                                      //bol tu bug, tak som to vyriesil cez Informacie.aktualneViditelneMeno
+        }*/
+      }
+      if(Informacie.aktualneViditelneMeno!=null) {
+        Informacie.aktualneViditelneMeno.set("fill", "transparent");
+      }
+      Informacie.plocha.remove(Informacie.vizitka);
+      this.renderAll();
+    })
+  }
+
+
+  set_mouse_over_on_canvas(){
     this.canvas.on('mouse:over', function (e) {
       if (e.target instanceof fabric.Group) {
         if(e.target.type =="vertex" ) {
@@ -194,93 +168,71 @@ export class AppComponent implements OnInit {
         Informacie.plocha.add(Informacie.vizitka);
 
       }
-    });
+    })
+  }
 
-    this.canvas.on('mouse:out', function (e) {
-      if (e.target instanceof fabric.Group) {
-        if(e.target.type=="vertex") {
-          e.target.item(1).set("fill", 'transparent');
-          this.renderAll();
-        }
-        if(e.target.type == "multipol"){
-          e.target.item(1).set("fill", "transparent");
-          this.renderAll();
-        }
-        /*if(e.target.type == "multipol4" || e.target.type == "multipol3" || e.target.type == "multipol2" || e.target.type == "multipol5"){
-          e.target.item(0).item(1).set("fill", "transparent");
-          this.renderAll();                                      //bol tu bug, tak som to vyriesil cez Informacie.aktualneViditelneMeno
-        }*/
+
+
+
+
+
+
+
+  set_selection_on_canvas(){
+    this.canvas.on("object:selected", function (e) {
+      Informacie.selectedVrchol = e.target;
+      if (e.target.type == "vertex"){
+        e.target.item(0).set("fill", "#1E90FF");
+
       }
-      if(Informacie.aktualneViditelneMeno!=null) {
-        Informacie.aktualneViditelneMeno.set("fill", "transparent");
+      if(e.target.type == "fakeVrchol"){
+        e.target.set("fill", "#1E90FF");
       }
-      Informacie.plocha.remove(Informacie.vizitka);
-      this.renderAll();
+      Informacie.prvyVrchol = e.target;
+    });
+
+    this.canvas.on("selection:cleared", function () {
+      if(Informacie.selectedVrchol.type == "vertex"){
+        Informacie.selectedVrchol.item(0).set("fill",Informacie.selectedVrchol.aktualnaFarba);
+      }
+      Informacie.selectedVrchol.set("fill", Informacie.selectedVrchol.zakladnaFarba);
+      Informacie.prvyVrchol = null;
+      Informacie.druhyVrchol = null;
+
     });
 
 
-  }
+    this.canvas.on("selection:updated", function (e) {
+      if(Informacie.selectedVrchol.type == "vertex"){
+        Informacie.selectedVrchol.item(0).set("fill",Informacie.selectedVrchol.aktualnaFarba);
+      }
+      Informacie.selectedVrchol.set("fill", Informacie.selectedVrchol.zakladnaFarba);
 
-  //skusam get a post a funkcie na pomocne vypisovanie hran, vrcholov a multipolov na konzolu, pri odovzdavani tieto funkcie zmazem
-  skusam_get(){
-    /*$("body").on( "click", ".button-container button", function(){
-      alert( "Triggred by " + $(this).text() );
-    });*/
+      const activeObj = e.target;
+      if(activeObj.type =="vertex") {
+        activeObj.item(0).set("fill", "#1E90FF");
+      }
 
+      Informacie.selectedVrchol = activeObj;
 
+      Informacie.druhyVrchol = e.target;
+      if ((Informacie.prvyVrchol.type == "vertex" || Informacie.prvyVrchol.type == "fakeVrchol") && (Informacie.druhyVrchol.type == "vertex" || Informacie.druhyVrchol.type == "fakeVrchol")) {
 
-    let i=2;
-      $(".button-container").append( " <button>Button "+ i +"</button>" );
-      i++;
-    const url = "https://jsonplaceholder.typicode.com/posts";
+        const h = new HranaCommand(Informacie.prvyVrchol, Informacie.druhyVrchol, this);
+        h.execute();
+        while (Informacie.commands.length > Informacie.momentalnyStav) {
+          Informacie.commands.pop();
+        }
+        Informacie.redoBooelan.redo = true;
+        Informacie.commands.push(h);
+        Informacie.momentalnyStav = Informacie.commands.length;
 
-    $.get(url,function(data, status){
-      console.log(data[5]["title"]);           //JSON.stringify(data)
-      alert("Data: "+data[5].title+" status: "+status);
-    });
+      }
+      Informacie.prvyVrchol = null;
+      Informacie.druhyVrchol = null;
+      Informacie.prvyVrchol = e.target;
 
-  }
-
-  vypis_multipoly(){
-    for(let i=0;i<Informacie.multipolyVGrafe.length;i++){
-      console.log(Informacie.multipolyVGrafe[i]);
-    }
-    console.log(Informacie.multipolyVGrafe);
-  }
-
-  skusam_post(){
-    const url="https://jsonplaceholder.typicode.com/posts";
-    let udaje = {vertices:Informacie.vrcholyVGrafe,multipoles:Informacie.multipolyVGrafe,edges:Informacie.hranyVGrafe};
-    console.log(udaje);
-    confirm("agaga");
-    $.post(url, udaje,function(data, status){
-      let result = "";
-      $.each(data, function(k, v) {
-        result += k.toUpperCase() + ": " + v + "\n";
-      });
-      alert(result);
-      console.log("dostal som " +JSON.stringify(data));
-      alert("Data: "+data+" status: "+status);
-      console.log("status je "+status);
-      Informacie.multipolesNames[0].name=data["id"];
-      Informacie.hiddenBoolean[0].hidden = false;
-      Informacie.codeDisable.disable=false;
-      Informacie.kodGrafu="kod grafu tu";
-    });
-  }
-  vypisHrany() {
-    for(let i=0;i<Informacie.hranyVGrafe.length;i++){
-      console.log(Informacie.hranyVGrafe[i]);
-    }
-    console.log(Informacie.hranyVGrafe);
-
-  }
-
-  vypisVrcholy(){
-    for(let i=0;i<Informacie.vrcholyVGrafe.length;i++){
-      console.log(Informacie.vrcholyVGrafe[i]);
-    }
-    console.log(Informacie.vrcholyVGrafe);
+    })
   }
 
 
@@ -291,28 +243,16 @@ export class AppComponent implements OnInit {
   pridajVrchol(){
     this.disableUndo=false;
     this.disableRedo.redo = true;
-    const command = new VrcholCommand(this.canvas, this.cisloVrchola);
+    const command = new VrcholCommand(this.canvas, this.vertexName);
     while(Informacie.commands.length>Informacie.momentalnyStav){
       Informacie.commands.pop();
     }
     Informacie.commands.push(command);
     command.execute();
     Informacie.momentalnyStav=Informacie.commands.length;
-    this.cisloVrchola++;
+    this.vertexName++;
     Informacie.codeDisable.disable=true;
 
-  }
-  //zmaze uplne vsetko, nejde undo
-  zmaz_vsetko(){
-    Informacie.plocha.clear();
-    Informacie.multipolyVGrafe=[];
-    Informacie.vrcholyVGrafe=[];
-    Informacie.hranyVGrafe=[];
-    Informacie.momentalnyStav = 0;
-    this.multipolmeno=1;
-    this.cisloVrchola=1;
-    this.disableUndo=true;
-    Informacie.codeDisable.disable=true;
   }
 
 
@@ -329,65 +269,32 @@ export class AppComponent implements OnInit {
 
   }
 
+  change_moveable_for_static(){
+    Informacie.plocha.forEachObject(function(obj){
+      if(obj.type == "multipol4" || obj.type == "multipol3"|| obj.type == "multipol2" || obj.type == "multipol5"){
+        const lave = obj.left;
+        const horne = obj.top;
+        let size = Informacie.poleMultipolov[obj.name].length-1;
+        console.log("size je" + size);
+
+
+        for(let i=0;i<size;i++){
+          obj.item(i).set("suradnicaLeft",lave);
+          obj.item(i).set("suradnicaTop",horne);
+          Informacie.plocha.add(obj.item(i));
+        }
+        Informacie.poleMultipolov[obj.name][0].item(0).set("fill",obj.farbaSpojenia);
+        Informacie.plocha.remove(obj);
+        Informacie.plocha.renderAll();
+      }
+
+    });
+  }
+
   //vykonava redo na pridavanie hran, multipolov a vrcholov
   redoMetoda():void{
     this.disableUndo=false;
-    Informacie.plocha.forEachObject(function(obj){
-      if(obj.type == "multipol4"){
-        const lave = obj.left;
-        const horne = obj.top;
-
-        for(let i=0;i<5;i++){
-          obj.item(i).set("suradnicaLeft",lave);
-          obj.item(i).set("suradnicaTop",horne);
-          Informacie.plocha.add(obj.item(i));
-        }
-        Informacie.poleMultipolov[obj.name][0].item(0).set("fill",obj.farbaSpojenia);
-        Informacie.plocha.remove(obj);
-        Informacie.plocha.renderAll();
-      }
-      if(obj.type == "multipol5"){
-        const lave = obj.left;
-        const horne = obj.top;
-
-        for(let i=0;i<6;i++){
-          obj.item(i).set("suradnicaLeft",lave);
-          obj.item(i).set("suradnicaTop",horne);
-          Informacie.plocha.add(obj.item(i));
-        }
-        Informacie.poleMultipolov[obj.name][0].item(0).set("fill",obj.farbaSpojenia);
-        Informacie.plocha.remove(obj);
-        Informacie.plocha.renderAll();
-      }
-
-      if(obj.type == "multipol3"){
-        const lave = obj.left;
-        const horne = obj.top;
-
-        for(let i=0;i<4;i++){
-          obj.item(i).set("suradnicaLeft",lave);
-          obj.item(i).set("suradnicaTop",horne);
-          Informacie.plocha.add(obj.item(i));
-        }
-
-        Informacie.plocha.remove(obj);
-        Informacie.plocha.renderAll();
-      }
-
-      if(obj.type == "multipol2"){
-        const lave = obj.left;
-        const horne = obj.top;
-
-        for(let i=0;i<3;i++){
-          obj.item(i).set("suradnicaLeft",lave);
-          obj.item(i).set("suradnicaTop",horne);
-          Informacie.plocha.add(obj.item(i));
-        }
-
-        Informacie.plocha.remove(obj);
-        Informacie.plocha.renderAll();
-      }
-    });
+    this.change_moveable_for_static();
     Informacie.commands[Informacie.momentalnyStav].execute();
     Informacie.momentalnyStav++;
     if(Informacie.momentalnyStav==Informacie.commands.length){
@@ -395,64 +302,6 @@ export class AppComponent implements OnInit {
     }
     Informacie.codeDisable.disable=true;
 
-  }
-
-
-  //pomocna funkcia ktora prida multipol s 5 vytrcajucimi hranami
-  addMultipol5():void{
-    this.disableUndo=false;
-    this.disableRedo.redo=true;
-    const multipol5 = new Multipol5Command(this.multipolmeno,"fake1","fake2","fake3","fake4","fake5","typ");
-    this.multipolmeno++;
-    while(Informacie.commands.length>Informacie.momentalnyStav){
-      Informacie.commands.pop();
-    }
-    multipol5.execute();
-    Informacie.commands.push(multipol5);
-    Informacie.momentalnyStav=Informacie.commands.length;
-    Informacie.codeDisable.disable=true;
-  }
-//pomocna funkcia ktora prida multipol so 4 vytrcajucimi hranami
-addMultipol4():void{
-  this.disableUndo=false;
-  this.disableRedo.redo=true;
-    const multipol4 = new Multipol4Command(this.multipolmeno,"fake1","fake2","fake3","fake4","typ");
-    this.multipolmeno++;
-  while(Informacie.commands.length>Informacie.momentalnyStav){
-    Informacie.commands.pop();
-  }
-    multipol4.execute();
-  Informacie.commands.push(multipol4);
-  Informacie.momentalnyStav=Informacie.commands.length;
-  Informacie.codeDisable.disable=true;
-}
-//pomocna funkcia ktora prida multipol s 3 vytrcajucimi hranami
-  addMultipol3():void{
-    this.disableUndo=false;
-    this.disableRedo.redo=true;
-    const multipol3 = new Multipol3Command(this.multipolmeno,"fake1","fake2","fake3","typ");
-    this.multipolmeno++;
-    while(Informacie.commands.length>Informacie.momentalnyStav){
-      Informacie.commands.pop();
-    }
-    multipol3.execute();
-    Informacie.commands.push(multipol3);
-    Informacie.momentalnyStav=Informacie.commands.length;
-    Informacie.codeDisable.disable=true;
-  }
-//pomocna funkcia ktora prida multipol s 2 vytrcajucimi hranami
-  addMultipol2():void{
-    this.disableUndo=false;
-    this.disableRedo.redo=true;
-    const multipol2 = new Multipol2Command(this.multipolmeno,"fake1","fake2","typ_zo_servera");
-    this.multipolmeno++;
-    while(Informacie.commands.length>Informacie.momentalnyStav){
-      Informacie.commands.pop();
-    }
-    multipol2.execute();
-    Informacie.commands.push(multipol2);
-    Informacie.momentalnyStav=Informacie.commands.length;
-    Informacie.codeDisable.disable=true;
   }
 
 
@@ -536,9 +385,10 @@ addMultipol4():void{
 
   //funkcia, ktora bude serveru posielat vsetky hrany, vrcholy a multipoly v grafe a dostane od servera sparse6 kod grafu
   graph(){
+
     const url="http://localhost:8080/graph";
     let udaje = {"vertices":Informacie.vrcholyVGrafe,"multipoles":Informacie.multipolyVGrafe,"edges":Informacie.hranyVGrafe};
-
+    console.log(udaje);
 
     $.post(url, udaje,function(data, status){
       if(status="success") {
@@ -590,50 +440,6 @@ addMultipol4():void{
 
   }
 
-//tu len skusam to co dostanem od servera ci to viem spracovat, len to co vlastne ocakavam ze dostanem od servera
-  get_multipoles_fake(){
-
-    let pole = [];
-    let poleMult = ["i1", "i2", "o1", "o2", "r"];
-    pole.push("negator_Pg");
-    pole.push(poleMult);
-    Informacie.multipolyNaPouzitie.push(pole);
-    pole = [];
-    poleMult = ["i1", "i2", "o1", "o2"];
-    pole.push("isochromatic_Pg");
-    pole.push(poleMult);
-    Informacie.multipolyNaPouzitie.push(pole);
-    pole = [];
-    poleMult = ["i1", "i2", "o1", "o2", "o3"];
-    pole.push("(2,3)-pole_Pg");
-    pole.push(poleMult);
-    Informacie.multipolyNaPouzitie.push(pole);
-
-    for(let i=0;i<Informacie.multipolyNaPouzitie.length;i++){
-      this.menoMultipolov[i]=Informacie.multipolyNaPouzitie[i][0];
-      this.hideMultipoly[i]=false;
-    }
-    this.disableGet=true;
-
-
-  }
-//skusam ako by mohlo vizerat get invariants
-  get_invariants_skusam(){
-    const url="https://jsonplaceholder.typicode.com/posts";
-    let udaje = Informacie.kodGrafu;
-    console.log(udaje);
-
-    $.get(url, udaje,function(data, status){
-      let result = "";
-      $.each(data[5], function(k, v) {
-        result += k.toUpperCase() + ": " + v + "\n";
-      });
-      alert(result);
-    });
-    Informacie.codeDisable.disable=false;
-    Informacie.kodGrafu="tu by mal byt kod grafu";
-
-  }
 
 
   // Function to download data to a file
