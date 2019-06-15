@@ -1,6 +1,6 @@
 import {Command} from './command';
 import {fabric} from 'fabric';
-import {Informacie} from '../informacie';
+import {Data} from '../data';
 
 export class Multipol5Command implements Command{
   group:any;
@@ -11,26 +11,26 @@ export class Multipol5Command implements Command{
   fake5:any;
   multipol:any;
   array:any;
-  prvykrat:boolean;
-  meno:number;
+  first_time:boolean;
+  id:number;
   multipolJS:any;
 
 
 
 
-  constructor(meno,fake1meno,fake2meno,fake3meno,fake4meno,fake5meno,type){
+  constructor(id,name1,name2,name3,name4,name5,type){
     this.multipolJS={
       "name":type,
-      "id":meno.toString(),
+      "id":id.toString(),
 
 
     };
-    this.meno = meno;
-    this.prvykrat=true;
+    this.id = id;
+    this.first_time=true;
     this.array = new Array();
 
-    this.create_center_of_multipol(meno,type);
-    this.create_dangling_edges(fake1meno,fake2meno,fake3meno,fake4meno,fake5meno);
+    this.create_center_of_multipol(id,type);
+    this.create_dangling_edges(name1,name2,name3,name4,name5);
     this.create_multipol_object();
     this.add_doubleclick_to_static_multipol();
     this.add_doubleclick_to_moveable_multipol();
@@ -48,7 +48,7 @@ export class Multipol5Command implements Command{
     this.group.addWithUpdate(this.fake4);
     this.group.addWithUpdate(this.fake5);
     this.group.set("type","multipol5");
-    this.group.set("name",this.meno);
+    this.group.set("name",this.id);
     this.group.lockScalingX=true;
     this.group.lockScalingY=true;
     this.group.lockRotation=true;
@@ -61,41 +61,41 @@ export class Multipol5Command implements Command{
 
   add_doubleclick_to_moveable_multipol(){
     this.group.on("mousedblclick",function(){
-      const lave = this.left;
-      const horne = this.top;
+      const left = this.left;
+      const top = this.top;
 
       for(let i=0;i<6;i++){
-        this.item(i).set("suradnicaLeft",lave);
-        this.item(i).set("suradnicaTop",horne);
-        Informacie.plocha.add(this.item(i));
+        this.item(i).set("suradnicaLeft",left);
+        this.item(i).set("suradnicaTop",top);
+        Data.canvas.add(this.item(i));
       }
       this.item(0).item(0).set("fill",this.farbaSpojenia);
-      Informacie.aktualneViditelneMeno.set("fill","transparent");   //iba mensia uprava, lebo obcas to bolo viditelne aj ked namalo byt
-      Informacie.plocha.remove(this);
-      Informacie.plocha.renderAll();
+      Data.name_of_active_object.set("fill","transparent");   //iba mensia uprava, lebo obcas to bolo viditelne aj ked namalo byt
+      Data.canvas.remove(this);
+      Data.canvas.renderAll();
     });
   }
   add_doubleclick_to_static_multipol(){
     this.multipol.on("mousedblclick",function(options){
 
-      for(let i=0;i<Informacie.poleMultipolov[this.name].length-1;i++){
-        Informacie.plocha.remove(Informacie.poleMultipolov[this.name][i]);
+      for(let i=0; i<Data.array_of_multipoles_objects[this.name].length-1; i++){
+        Data.canvas.remove(Data.array_of_multipoles_objects[this.name][i]);
       }
 
-      Informacie.poleMultipolov[this.name][6].set("left",this.suradnicaLeft);
-      Informacie.poleMultipolov[this.name][6].set("top",this.suradnicaTop);
-      this.item(0).set("fill",Informacie.poleMultipolov[this.name][6].zakladnaFarba);
-      Informacie.plocha.add(Informacie.poleMultipolov[this.name][6]);
+      Data.array_of_multipoles_objects[this.name][6].set("left",this.suradnicaLeft);
+      Data.array_of_multipoles_objects[this.name][6].set("top",this.suradnicaTop);
+      this.item(0).set("fill",Data.array_of_multipoles_objects[this.name][6].zakladnaFarba);
+      Data.canvas.add(Data.array_of_multipoles_objects[this.name][6]);
 
-      Informacie.plocha.remove(Informacie.vizitka);
-      Informacie.plocha.renderAll();
+      Data.canvas.remove(Data.label);
+      Data.canvas.renderAll();
 
 
     });
 
 
   }
-  create_dangling_edges(fake1meno,fake2meno,fake3meno,fake4meno,fake5meno){
+  create_dangling_edges(fake1name,fake2name,fake3name,fake4name,fake5name){
     this.fake1 = new fabric.Circle({
       radius:30,
       fill:"pink",
@@ -103,7 +103,7 @@ export class Multipol5Command implements Command{
       stroke:"black",
       left:122,
       strokeWidth:5,
-      name:fake1meno
+      name:fake1name
     });
 
     this.fake2 = new fabric.Circle({
@@ -113,7 +113,7 @@ export class Multipol5Command implements Command{
       stroke:"black",
       left:30,
       strokeWidth:5,
-      name:fake2meno
+      name:fake2name
     });
     this.fake3 = new fabric.Circle({
       radius:30,
@@ -122,7 +122,7 @@ export class Multipol5Command implements Command{
       stroke:"black",
       left:55,
       strokeWidth:5,
-      name:fake3meno
+      name:fake3name
     });
     this.fake4 = new fabric.Circle({
       radius:30,
@@ -131,7 +131,7 @@ export class Multipol5Command implements Command{
       stroke:"black",
       left:185,
       strokeWidth:5,
-      name:fake4meno
+      name:fake4name
     });
 
     this.fake5 = new fabric.Circle({
@@ -141,13 +141,13 @@ export class Multipol5Command implements Command{
       stroke:"black",
       left:210,
       strokeWidth:5,
-      name:fake5meno
+      name:fake5name
     });
-    let fake1JS = {"type":"multipol","id":this.meno.toString(),"dangling_edge":this.fake1.name};
-    let fake2JS = {"type":"multipol","id":this.meno.toString(),"dangling_edge":this.fake2.name};
-    let fake3JS = {"type":"multipol","id":this.meno.toString(),"dangling_edge":this.fake3.name};
-    let fake4JS = {"type":"multipol","id":this.meno.toString(),"dangling_edge":this.fake4.name};
-    let fake5JS = {"type":"multipol","id":this.meno.toString(),"dangling_edge":this.fake5.name};
+    let fake1JS = {"type":"multipol","id":this.id.toString(),"dangling_edge":this.fake1.name};
+    let fake2JS = {"type":"multipol","id":this.id.toString(),"dangling_edge":this.fake2.name};
+    let fake3JS = {"type":"multipol","id":this.id.toString(),"dangling_edge":this.fake3.name};
+    let fake4JS = {"type":"multipol","id":this.id.toString(),"dangling_edge":this.fake4.name};
+    let fake5JS = {"type":"multipol","id":this.id.toString(),"dangling_edge":this.fake5.name};
 
     this.fake1.set("reprezentaciaJS",fake1JS);
     this.fake2.set("reprezentaciaJS",fake2JS);
@@ -156,8 +156,8 @@ export class Multipol5Command implements Command{
     this.fake5.set("reprezentaciaJS",fake5JS);
   }
 
-  create_center_of_multipol(meno,type){
-    let stredKruh = new fabric.Circle({
+  create_center_of_multipol(id,type){
+    let circle = new fabric.Circle({
       radius:50,
       fill:'#FFBF80',
       top:200,
@@ -166,22 +166,22 @@ export class Multipol5Command implements Command{
       strokeWidth:5,
     });
 
-    let text=new fabric.Text(meno.toString(), {left: stredKruh.left+42,
-      top: stredKruh.top+27,
+    let text=new fabric.Text(id.toString(), {left: circle.left+42,
+      top: circle.top+27,
       fill:"transparent"
     });
-    if(this.meno/10 >=1){
-      text.set("left",stredKruh.left+32);
+    if(this.id/10 >=1){
+      text.set("left",circle.left+32);
     }
 
     this.multipol = new fabric.Group();
-    this.multipol.addWithUpdate(stredKruh);
+    this.multipol.addWithUpdate(circle);
     this.multipol.addWithUpdate(text);
     this.multipol.set("type","multipol");
     this.multipol.set("vypis",type);
     this.multipol.set("left",100);
     this.multipol.set("top",200);
-    this.multipol.set("name",this.meno); // tu mozno radse meno.toString()
+    this.multipol.set("name",this.id); // tu mozno radse id.toString()
     this.multipol.lockMovementX=true;
     this.multipol.lockMovementY=true;
 
@@ -195,7 +195,7 @@ export class Multipol5Command implements Command{
     this.array[5] =this.fake5;
     this.array[6]=this.group;
 
-    Informacie.poleMultipolov[this.meno] = this.array;
+    Data.array_of_multipoles_objects[this.id] = this.array;
 
 
     for(let i=1;i<6;i++){
@@ -204,7 +204,7 @@ export class Multipol5Command implements Command{
       this.array[i].set("zakladnaFarba","pink");
       this.array[i].set("type","fakeVrchol");
       this.array[i].set("pocetHran",0);
-      this.array[i].set("multipol",this.meno);
+      this.array[i].set("multipol",this.id);
       this.array[i].lockMovementX=true;
       this.array[i].lockMovementY=true;
       this.array[i].set("typ_multipola","multipol5");
@@ -215,38 +215,38 @@ export class Multipol5Command implements Command{
 
 
   execute() {
-    if(this.prvykrat){
-      Informacie.plocha.add(this.group);
-      this.prvykrat=false;
+    if(this.first_time){
+      Data.canvas.add(this.group);
+      this.first_time=false;
     }
     else {
-      Informacie.poleMultipolov[this.multipol.name][6].set("left",this.multipol.suradnicaLeft);
-      Informacie.poleMultipolov[this.multipol.name][6].set("top",this.multipol.suradnicaTop);
+      Data.array_of_multipoles_objects[this.multipol.name][6].set("left",this.multipol.suradnicaLeft);
+      Data.array_of_multipoles_objects[this.multipol.name][6].set("top",this.multipol.suradnicaTop);
 
-      for (let i = 0; i < Informacie.poleMultipolov[this.group.name].length-1; i++) {
-        Informacie.plocha.add(Informacie.poleMultipolov[this.group.name][i]);
+      for (let i = 0; i < Data.array_of_multipoles_objects[this.group.name].length-1; i++) {
+        Data.canvas.add(Data.array_of_multipoles_objects[this.group.name][i]);
       }
       this.multipol.item(0).set("fill",this.group.farbaSpojenia);
     }
-    Informacie.multipolyVGrafe.push(this.multipolJS);
+    Data.multipoles_in_graph.push(this.multipolJS);
   }
 
   unexecute() {
-    Informacie.plocha.remove(this.group);
-    const lave = this.group.left;
-    const horne = this.group.top;
+    Data.canvas.remove(this.group);
+    const left = this.group.left;
+    const top = this.group.top;
 
     for(let i=0;i<6;i++){
-      this.group.item(i).set("suradnicaLeft",lave);
-      this.group.item(i).set("suradnicaTop",horne);
+      this.group.item(i).set("suradnicaLeft",left);
+      this.group.item(i).set("suradnicaTop",top);
     }
 
-    for(var i=0;i<Informacie.poleMultipolov[this.group.name].length-1;i++){
-      Informacie.plocha.remove(Informacie.poleMultipolov[this.group.name][i]);
+    for(var i=0; i<Data.array_of_multipoles_objects[this.group.name].length-1; i++){
+      Data.canvas.remove(Data.array_of_multipoles_objects[this.group.name][i]);
     }
 
-    let index = Informacie.multipolyVGrafe.indexOf(this.multipolJS);
-    Informacie.multipolyVGrafe.splice(index,1);
+    let index = Data.multipoles_in_graph.indexOf(this.multipolJS);
+    Data.multipoles_in_graph.splice(index,1);
 
   }
 }

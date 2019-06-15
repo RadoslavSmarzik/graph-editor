@@ -3,7 +3,7 @@
 <div id="flex">
   <ul class ="inner">
 
-     <li><button (click)="pridajVrchol()">VERTEX</button></li>
+     <li><button (click)="add_vertex()">VERTEX</button></li>
     <li><button class="multipoly" (click)="add_multipol(0)" [hidden]="hideMultipoles[0].hidden">{{nameMultipoles[0].name}}</button></li>
     <li><button class="multipoly" (click)="add_multipol(1)" [hidden]="hideMultipoles[1].hidden">{{nameMultipoles[1].name}}</button></li>
     <li><button class="multipoly" (click)="add_multipol(2)" [hidden]="hideMultipoles[2].hidden">{{nameMultipoles[2].name}}</button></li>
@@ -30,8 +30,8 @@
     <br>
     <br>
     <br>
-    <li><button (click)="undoMetoda()" [disabled]="disableUndo" >UNDO</button></li>
-    <li><button (click)="redoMetoda()" [disabled]="disableRedo.redo">REDO</button></li>
+    <li><button (click)="undoMethod()" [disabled]="disableUndo" >UNDO</button></li>
+    <li><button (click)="redoMethod()" [disabled]="disableRedo.redo">REDO</button></li>
 
 
    </ul>

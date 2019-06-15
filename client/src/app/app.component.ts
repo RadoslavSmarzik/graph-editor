@@ -1,8 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import {fabric} from 'fabric';
-import {VrcholCommand} from './Commandy/vrchol-command';
-import {Informacie} from './informacie';
-import {HranaCommand} from './Commandy/hrana-command';
+import {VertexCommand} from './Commandy/vertex-command';
+import {Data} from './data';
+import {EdgeCommand} from './Commandy/edge-command';
 import {Multipol4Command} from './Commandy/multipol4-command';
 import {Multipol3Command} from './Commandy/multipol3-command';
 import {Multipol2Command} from './Commandy/multipol2-command';
@@ -23,8 +23,7 @@ export class AppComponent implements OnInit {
   disableUndo: Boolean;
   disableRedo: any;
   vertexName: number;
-  multipolmeno:number;
-  hideMultipoly:Array<Boolean>;
+  multipolName:number;
   disableCode:Boolean;
   hideMultipoles:any;
   nameMultipoles:any;
@@ -34,24 +33,24 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
 
-    //inicializacia
+
     this.vertexName = 1;
-    this.multipolmeno=1;
-    Informacie.multipolyNaPouzitie = [];
-    Informacie.redoBooelan = {redo:true};
-    this.disableRedo=Informacie.redoBooelan;
-    Informacie.codeDisable={disable:true};
-    this.disableCode=Informacie.codeDisable;   //uvideme ako ide
-    Informacie.multipolesNames=[];
-    Informacie.hiddenBoolean=[];
+    this.multipolName=1;
+   // Data.multipoles_for_use = [];
+    Data.redoBooelan = {redo:true};
+    this.disableRedo=Data.redoBooelan;
+    Data.codeDisable={disable:true};
+    this.disableCode=Data.codeDisable;
+    Data.multipolesNames=[];
+    Data.multipolesHidden=[];
     for(let i=0;i<5;i++){
       let hidden = {hidden:true};
       let name = {name:""};
-      Informacie.multipolesNames.push(name);
-      Informacie.hiddenBoolean.push(hidden);
+      Data.multipolesNames.push(name);
+      Data.multipolesHidden.push(hidden);
     }
-    this.nameMultipoles=Informacie.multipolesNames;
-    this.hideMultipoles=Informacie.hiddenBoolean;
+    this.nameMultipoles=Data.multipolesNames;
+    this.hideMultipoles=Data.multipolesHidden;
 
 
     this.canvas = new fabric.Canvas('myCanvas');
@@ -59,28 +58,28 @@ export class AppComponent implements OnInit {
     this.disableStop = true;
     this.disableUndo = true;
     this.disableRedo.redo=true;
-    Informacie.momentalnyStav = 0;
-    Informacie.commands=[];
-    Informacie.poleMultipolov = new Array();
-    Informacie.plocha=this.canvas;
-    Informacie.vrcholyVGrafe = new Array();
-    Informacie.multipolyVGrafe = new Array();
-    Informacie.hranyVGrafe = new Array();
-    Informacie.vrcholyVGrafe = new Array<number>();
-    Informacie.aktualneViditelneMeno = null;
-    Informacie.kodGrafu  = null;
-    this.hideMultipoly=[];
+    Data.state = 0;
+    Data.commands=[];
+    Data.array_of_multipoles_objects = new Array();
+    Data.canvas=this.canvas;
+    Data.vertices_in_graph = new Array();
+    Data.multipoles_in_graph = new Array();
+    Data.edges_in_graph = new Array();
+    Data.vertices_in_graph = new Array<number>();
+    Data.name_of_active_object = null;
+    Data.graph_code  = null;
+
 
 
 
 
     this.get_multipoles();
-    //nastavenie selektovania objektov na ploche, ked selektnem 2 vrcholy alebo 2 dagling_edge(alebo vrchol a dagling_edge) hned za sebou tak sa vytvori hrana
+    //nastavenie selektovania objektov na ploche, ked selektnem 2 vrcholy alebo 2 dagling_edge(alebo circle a dagling_edge) hned za sebou tak sa vytvori hrana
     this.set_selection_on_canvas();
 
 
 
-    //nastavovanie toho, ze ked prejdem nad nejakym objektom ukaze sa jeho meno
+    //nastavovanie toho, ze ked prejdem nad nejakym objektom ukaze sa jeho id
     this.set_mouse_over_on_canvas();
     this.set_mouse_out_on_canvas();
 
@@ -105,15 +104,12 @@ export class AppComponent implements OnInit {
           e.target.item(1).set("fill", "transparent");
           this.renderAll();
         }
-        /*if(e.target.type == "multipol4" || e.target.type == "multipol3" || e.target.type == "multipol2" || e.target.type == "multipol5"){
-          e.target.item(0).item(1).set("fill", "transparent");
-          this.renderAll();                                      //bol tu bug, tak som to vyriesil cez Informacie.aktualneViditelneMeno
-        }*/
+
       }
-      if(Informacie.aktualneViditelneMeno!=null) {
-        Informacie.aktualneViditelneMeno.set("fill", "transparent");
+      if(Data.name_of_active_object!=null) {
+        Data.name_of_active_object.set("fill", "transparent");
       }
-      Informacie.plocha.remove(Informacie.vizitka);
+      Data.canvas.remove(Data.label);
       this.renderAll();
     })
   }
@@ -128,11 +124,11 @@ export class AppComponent implements OnInit {
         }
         if(e.target.type == "multipol"){
           e.target.item(1).set("fill", "black");
-          const zhora = e.e.pageY;
-          const zlava = e.e.pageX;
+          const top = e.e.pageY;
+          const left = e.e.pageX;
 
-          Informacie.vizitka = new fabric.Text(e.target.vypis,{left: zlava -200,
-            top: zhora -120,
+          Data.label = new fabric.Text(e.target.vypis,{left: left -200,
+            top: top -120,
             fill:"white",
             backgroundColor: "black",
             height: 12,
@@ -141,12 +137,12 @@ export class AppComponent implements OnInit {
 
           });
 
-          Informacie.plocha.add(Informacie.vizitka);
+          Data.canvas.add(Data.label);
           this.renderAll();
         }
         if(e.target.type == "multipol4" || e.target.type == "multipol3" || e.target.type == "multipol2" || e.target.type == "multipol5"){
           e.target.item(0).item(1).set("fill", "black");
-          Informacie.aktualneViditelneMeno = e.target.item(0).item(1);
+          Data.name_of_active_object = e.target.item(0).item(1);
           this.renderAll();
         }
 
@@ -154,10 +150,10 @@ export class AppComponent implements OnInit {
       }
 
       if(e.target instanceof fabric.Circle  && e.target.type == "fakeVrchol"){
-        const zhora = e.e.pageY;
-        const zlava = e.e.pageX;
-        Informacie.vizitka = new fabric.Text(e.target.name,{left: zlava -200,
-          top: zhora -120,
+        const top = e.e.pageY;
+        const left = e.e.pageX;
+        Data.label = new fabric.Text(e.target.name,{left: left -200,
+          top: top -120,
           fill:"white",
           backgroundColor: "black",
           height: 12,
@@ -165,7 +161,7 @@ export class AppComponent implements OnInit {
           fontSize: 25
 
         });
-        Informacie.plocha.add(Informacie.vizitka);
+        Data.canvas.add(Data.label);
 
       }
     })
@@ -180,7 +176,7 @@ export class AppComponent implements OnInit {
 
   set_selection_on_canvas(){
     this.canvas.on("object:selected", function (e) {
-      Informacie.selectedVrchol = e.target;
+      Data.selectedVertex = e.target;
       if (e.target.type == "vertex"){
         e.target.item(0).set("fill", "#1E90FF");
 
@@ -188,49 +184,49 @@ export class AppComponent implements OnInit {
       if(e.target.type == "fakeVrchol"){
         e.target.set("fill", "#1E90FF");
       }
-      Informacie.prvyVrchol = e.target;
+      Data.firstVertex = e.target;
     });
 
     this.canvas.on("selection:cleared", function () {
-      if(Informacie.selectedVrchol.type == "vertex"){
-        Informacie.selectedVrchol.item(0).set("fill",Informacie.selectedVrchol.aktualnaFarba);
+      if(Data.selectedVertex.type == "vertex"){
+        Data.selectedVertex.item(0).set("fill",Data.selectedVertex.aktualnaFarba);
       }
-      Informacie.selectedVrchol.set("fill", Informacie.selectedVrchol.zakladnaFarba);
-      Informacie.prvyVrchol = null;
-      Informacie.druhyVrchol = null;
+      Data.selectedVertex.set("fill", Data.selectedVertex.zakladnaFarba);
+      Data.firstVertex = null;
+      Data.secondVertex = null;
 
     });
 
 
     this.canvas.on("selection:updated", function (e) {
-      if(Informacie.selectedVrchol.type == "vertex"){
-        Informacie.selectedVrchol.item(0).set("fill",Informacie.selectedVrchol.aktualnaFarba);
+      if(Data.selectedVertex.type == "vertex"){
+        Data.selectedVertex.item(0).set("fill",Data.selectedVertex.aktualnaFarba);
       }
-      Informacie.selectedVrchol.set("fill", Informacie.selectedVrchol.zakladnaFarba);
+      Data.selectedVertex.set("fill", Data.selectedVertex.zakladnaFarba);
 
-      const activeObj = e.target;
-      if(activeObj.type =="vertex") {
-        activeObj.item(0).set("fill", "#1E90FF");
+      const activeObject = e.target;
+      if(activeObject.type =="vertex") {
+        activeObject.item(0).set("fill", "#1E90FF");
       }
 
-      Informacie.selectedVrchol = activeObj;
+      Data.selectedVertex = activeObject;
 
-      Informacie.druhyVrchol = e.target;
-      if ((Informacie.prvyVrchol.type == "vertex" || Informacie.prvyVrchol.type == "fakeVrchol") && (Informacie.druhyVrchol.type == "vertex" || Informacie.druhyVrchol.type == "fakeVrchol")) {
+      Data.secondVertex = e.target;
+      if ((Data.firstVertex.type == "vertex" || Data.firstVertex.type == "fakeVrchol") && (Data.secondVertex.type == "vertex" || Data.secondVertex.type == "fakeVrchol")) {
 
-        const h = new HranaCommand(Informacie.prvyVrchol, Informacie.druhyVrchol, this);
-        h.execute();
-        while (Informacie.commands.length > Informacie.momentalnyStav) {
-          Informacie.commands.pop();
+        let edge = new EdgeCommand(Data.firstVertex, Data.secondVertex);
+        edge.execute();
+        while (Data.commands.length > Data.state) {
+          Data.commands.pop();
         }
-        Informacie.redoBooelan.redo = true;
-        Informacie.commands.push(h);
-        Informacie.momentalnyStav = Informacie.commands.length;
+        Data.redoBooelan.redo = true;
+        Data.commands.push(edge);
+        Data.state = Data.commands.length;
 
       }
-      Informacie.prvyVrchol = null;
-      Informacie.druhyVrchol = null;
-      Informacie.prvyVrchol = e.target;
+      Data.firstVertex = null;
+      Data.secondVertex = null;
+      Data.firstVertex = e.target;
 
     })
   }
@@ -240,113 +236,113 @@ export class AppComponent implements OnInit {
 
 
  //pridanie vrchola na plochu
-  pridajVrchol(){
+  add_vertex(){
     this.disableUndo=false;
     this.disableRedo.redo = true;
-    const command = new VrcholCommand(this.canvas, this.vertexName);
-    while(Informacie.commands.length>Informacie.momentalnyStav){
-      Informacie.commands.pop();
+    const command = new VertexCommand(this.canvas, this.vertexName);
+    while(Data.commands.length>Data.state){
+      Data.commands.pop();
     }
-    Informacie.commands.push(command);
+    Data.commands.push(command);
     command.execute();
-    Informacie.momentalnyStav=Informacie.commands.length;
+    Data.state=Data.commands.length;
     this.vertexName++;
-    Informacie.codeDisable.disable=true;
+    Data.codeDisable.disable=true;
 
   }
 
 
   //vykonva undo na pridavanie hran, multipolov a vrcholov
-  undoMetoda():void{
-    Informacie.commands[Informacie.momentalnyStav-1].unexecute();
-    Informacie.momentalnyStav--;
+  undoMethod():void{
+    Data.commands[Data.state-1].unexecute();
+    Data.state--;
     this.disableRedo.redo=false;
-    if(Informacie.momentalnyStav==0){
+    if(Data.state==0){
       this.disableUndo=true;
     }
-    Informacie.codeDisable.disable=true;
+    Data.codeDisable.disable=true;
 
 
   }
 
-  change_moveable_for_static(){
-    Informacie.plocha.forEachObject(function(obj){
-      if(obj.type == "multipol4" || obj.type == "multipol3"|| obj.type == "multipol2" || obj.type == "multipol5"){
-        const lave = obj.left;
-        const horne = obj.top;
-        let size = Informacie.poleMultipolov[obj.name].length-1;
-        console.log("size je" + size);
+  //vykonava redo na pridavanie hran, multipolov a vrcholov
+  redoMethod():void{
+    this.disableUndo=false;
+    this.change_moveable_for_static();
+    Data.commands[Data.state].execute();
+    Data.state++;
+    if(Data.state==Data.commands.length){
+      this.disableRedo.redo=true;
+    }
+    Data.codeDisable.disable=true;
 
+  }
+
+  change_moveable_for_static(){
+    Data.canvas.forEachObject(function(obj){
+      if(obj.type == "multipol4" || obj.type == "multipol3"|| obj.type == "multipol2" || obj.type == "multipol5"){
+        const left = obj.left;
+        const top = obj.top;
+        let size = Data.array_of_multipoles_objects[obj.name].length-1;
 
         for(let i=0;i<size;i++){
-          obj.item(i).set("suradnicaLeft",lave);
-          obj.item(i).set("suradnicaTop",horne);
-          Informacie.plocha.add(obj.item(i));
+          obj.item(i).set("suradnicaLeft",left);
+          obj.item(i).set("suradnicaTop",top);
+          Data.canvas.add(obj.item(i));
         }
-        Informacie.poleMultipolov[obj.name][0].item(0).set("fill",obj.farbaSpojenia);
-        Informacie.plocha.remove(obj);
-        Informacie.plocha.renderAll();
+        Data.array_of_multipoles_objects[obj.name][0].item(0).set("fill",obj.farbaSpojenia);
+        Data.canvas.remove(obj);
+        Data.canvas.renderAll();
       }
 
     });
   }
 
-  //vykonava redo na pridavanie hran, multipolov a vrcholov
-  redoMetoda():void{
-    this.disableUndo=false;
-    this.change_moveable_for_static();
-    Informacie.commands[Informacie.momentalnyStav].execute();
-    Informacie.momentalnyStav++;
-    if(Informacie.momentalnyStav==Informacie.commands.length){
-      this.disableRedo.redo=true;
-    }
-    Informacie.codeDisable.disable=true;
 
-  }
 
 
   //fukcia, ktoru vyuzivaju buttony ktore sa ukazu az ked dostaneme zo servera pole multipolov, prida novy multipol na plochu
   add_multipol(n:number){
     let multipol;
-    /*if(Informacie.multipolyNaPouzitie.length<n+1){  //mozem to dat teraz aj prec
+    /*if(Data.multipoles_for_use.length<n+1){  //mozem to dat teraz aj prec
       console.log("multipoly nie su v databaze");
       return;
     }*/
-    let hrany = Informacie.multipolyNaPouzitie[n][1];
-    let typ = Informacie.multipolyNaPouzitie[n][0];
+    let dangling_edges = Data.multipoles_for_use[n][1];
+    let type = Data.multipoles_for_use[n][0];
 
-    if(hrany.length == 2){
-      multipol = new Multipol2Command(this.multipolmeno,hrany[0],hrany[1],typ);
+    if(dangling_edges.length == 2){
+      multipol = new Multipol2Command(this.multipolName,dangling_edges[0],dangling_edges[1],type);
     }
-    if(hrany.length == 3){
-      multipol = new Multipol3Command(this.multipolmeno,hrany[0],hrany[1],hrany[2],typ);
-
-    }
-    if(hrany.length == 4){
-      multipol = new Multipol4Command(this.multipolmeno,hrany[0],hrany[1],hrany[2],hrany[3],typ);
+    if(dangling_edges.length == 3){
+      multipol = new Multipol3Command(this.multipolName,dangling_edges[0],dangling_edges[1],dangling_edges[2],type);
 
     }
-    if(hrany.length == 5){
-      multipol = new Multipol5Command(this.multipolmeno,hrany[0],hrany[1],hrany[2],hrany[3],hrany[4],typ);
+    if(dangling_edges.length == 4){
+      multipol = new Multipol4Command(this.multipolName,dangling_edges[0],dangling_edges[1],dangling_edges[2],dangling_edges[3],type);
+
+    }
+    if(dangling_edges.length == 5){
+      multipol = new Multipol5Command(this.multipolName,dangling_edges[0],dangling_edges[1],dangling_edges[2],dangling_edges[3],dangling_edges[4],type);
 
     }
 
     this.disableUndo=false;
     this.disableRedo.redo=true;
-    this.multipolmeno++;
-    while(Informacie.commands.length>Informacie.momentalnyStav){
-      Informacie.commands.pop();
+    this.multipolName++;
+    while(Data.commands.length>Data.state){
+      Data.commands.pop();
     }
     multipol.execute();
-    Informacie.commands.push(multipol);
-    Informacie.momentalnyStav=Informacie.commands.length;
-    Informacie.codeDisable.disable=true;
+    Data.commands.push(multipol);
+    Data.state=Data.commands.length;
+    Data.codeDisable.disable=true;
 
   }
 
   //zobrazenie kodu grafu
   graph_code(){
-    alert(Informacie.kodGrafu);
+    alert(Data.graph_code);
   }
 
   //Funkcie na komunikaciu so serverom
@@ -357,16 +353,16 @@ export class AppComponent implements OnInit {
     $.get(url,function(data, status){
       if(status="success") {
         for (let i = 0; i < data.length; i++) {
-          let pole = [];
-          pole.push(data[i]["name"]);
-          pole.push(data[i]["dangling_edges"]); //mozno dangling_edges
-          Informacie.multipolyNaPouzitie.push(pole);
+          let info_about_multipol = [];
+          info_about_multipol.push(data[i]["name"]);
+          info_about_multipol.push(data[i]["dangling_edges"]); //mozno dangling_edges
+          Data.multipoles_for_use.push(info_about_multipol);
         }
 
 
-        for (let i = 0; i < Informacie.multipolyNaPouzitie.length; i++) {
-          Informacie.multipolesNames[i].name = Informacie.multipolyNaPouzitie[i][0];
-          Informacie.hiddenBoolean[i].hidden = false;
+        for (let i = 0; i < Data.multipoles_for_use.length; i++) {
+          Data.multipolesNames[i].name = Data.multipoles_for_use[i][0];
+          Data.multipolesHidden[i].hidden = false;
         }
       }
       else{
@@ -387,13 +383,13 @@ export class AppComponent implements OnInit {
   graph(){
 
     const url="http://localhost:8080/graph";
-    let udaje = {"vertices":Informacie.vrcholyVGrafe,"multipoles":Informacie.multipolyVGrafe,"edges":Informacie.hranyVGrafe};
-    console.log(udaje);
+    let data = {"vertices":Data.vertices_in_graph,"multipoles":Data.multipoles_in_graph,"edges":Data.edges_in_graph};
+    console.log(data);
 
-    $.post(url, udaje,function(data, status){
+    $.post(url, data,function(data, status){
       if(status="success") {
-        Informacie.kodGrafu = data;
-        Informacie.codeDisable.disable = false;
+        Data.graph_code = data;
+        Data.codeDisable.disable = false;
       }
     })
   .fail(function() {
@@ -406,16 +402,16 @@ export class AppComponent implements OnInit {
   //funkcia ktora vypise vsetky invarianty ziskane od servera
   get_invariants(){
     const url="http://localhost:8080/invariants";
-    let udaje = Informacie.kodGrafu;
+    let data = Data.graph_code;
 
 
-    $.get(url, udaje,function(data, status){
+    $.get(url, data,function(data, status){
       if(status = "success") {
         let result = "";
-        $.each(data, function (k, v) {
-          result += k + ": " + v + "\n";
+        $.each(data, function (key, value) {
+          result += key + ": " + value + "\n";
         });
-        confirm(result);
+        alert(result);
       }
     })
       .fail(function() {
@@ -431,7 +427,7 @@ export class AppComponent implements OnInit {
       selBox.style.left = '0';
       selBox.style.top = '0';
       selBox.style.opacity = '0';
-      selBox.value = Informacie.kodGrafu;
+      selBox.value = Data.graph_code;
       document.body.appendChild(selBox);
       selBox.focus();
       selBox.select();
@@ -444,7 +440,7 @@ export class AppComponent implements OnInit {
 
   // Function to download data to a file
   download(filename, type) {
-    let data = Informacie.kodGrafu;
+    let data = Data.graph_code;
     var file = new Blob([data], {type: type});
     if (window.navigator.msSaveOrOpenBlob) // IE10+
       window.navigator.msSaveOrOpenBlob(file, filename);
