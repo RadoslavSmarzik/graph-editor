@@ -15,22 +15,22 @@ export class EdgeCommand implements Command{
   constructor(first_obj,second_obj){
     this.first=first_obj;
     this.second=second_obj;
-    this.edgeJS = {"first":first_obj.reprezentaciaJS, "second":second_obj.reprezentaciaJS};
+    this.edgeJS = {"first":first_obj.representationJS, "second":second_obj.representationJS};
 
   }
 
   set_positions_of_polyline_multipol(fakeVertex, points){
-    if(fakeVertex.typ_multipola == "multipol4") {
-      points.push(new fabric.Point(fakeVertex.suradnicaLeft + 125, fakeVertex.suradnicaTop + 125));
+    if(fakeVertex.multipol_type == "multipol4") {
+      points.push(new fabric.Point(fakeVertex.positionLeft + 125, fakeVertex.positionTop + 125));
     }
-    if(fakeVertex.typ_multipola == "multipol2") {
-      points.push(new fabric.Point(fakeVertex.suradnicaLeft + 125, fakeVertex.suradnicaTop + 47.5));
+    if(fakeVertex.multipol_type == "multipol2") {
+      points.push(new fabric.Point(fakeVertex.positionLeft + 125, fakeVertex.positionTop + 47.5));
     }
-    if(fakeVertex.typ_multipola == "multipol3") {
-      points.push(new fabric.Point(fakeVertex.suradnicaLeft + 117.5, fakeVertex.suradnicaTop + 120));
+    if(fakeVertex.multipol_type == "multipol3") {
+      points.push(new fabric.Point(fakeVertex.positionLeft + 117.5, fakeVertex.positionTop + 120));
     }
-    if(fakeVertex.typ_multipola == "multipol5") {
-      points.push(new fabric.Point(fakeVertex.suradnicaLeft + 117.5, fakeVertex.suradnicaTop + 117.5));
+    if(fakeVertex.multipol_type == "multipol5") {
+      points.push(new fabric.Point(fakeVertex.positionLeft + 117.5, fakeVertex.positionTop + 117.5));
     }
   }
 
@@ -40,9 +40,9 @@ export class EdgeCommand implements Command{
       strokeWidth:5,
       selectable:false,
     });
-    this.polyLine.set("type","edge");          //tu bol type hrana
-    this.first.set("pocetHran",this.first.pocetHran+1);
-    this.second.set("pocetHran",this.second.pocetHran+1);
+    this.polyLine.set("type","edge");
+    this.first.set("edges",this.first.edges+1);
+    this.second.set("edges",this.second.edges+1);
     Data.canvas.add(this.polyLine);
     Data.canvas.moveTo(this.polyLine, -100);
 
@@ -59,14 +59,14 @@ export class EdgeCommand implements Command{
   make_vertex_moveable(vertex){
     vertex.lockMovementX = false;
     vertex.lockMovementY = false;
-    vertex.item(0).set("fill",vertex.zakladnaFarba);
-    vertex.set("aktualnaFarba",vertex.zakladnaFarba);
+    vertex.item(0).set("fill",vertex.main_color);
+    vertex.set("now_color",vertex.main_color);
   }
 
   how_many_edges_multipol_has(multipol){
     let edges=0;
     for(let i=1; i<Data.array_of_multipoles_objects[multipol].length-1; i++){
-      edges+=Data.array_of_multipoles_objects[multipol][i].pocetHran;
+      edges+=Data.array_of_multipoles_objects[multipol][i].edges;
     }
     return edges;
 
@@ -81,24 +81,19 @@ export class EdgeCommand implements Command{
 
       let index_of_group =Data.array_of_multipoles_objects[this.name].length -1;
 
-      Data.array_of_multipoles_objects[this.name][index_of_group].set("left", this.suradnicaLeft);
-      Data.array_of_multipoles_objects[this.name][index_of_group].set("top", this.suradnicaTop);
+      Data.array_of_multipoles_objects[this.name][index_of_group].set("left", this.positionLeft);
+      Data.array_of_multipoles_objects[this.name][index_of_group].set("top", this.positionTop);
       Data.canvas.add(Data.array_of_multipoles_objects[this.name][index_of_group]);
-      Data.array_of_multipoles_objects[this.name][0].item(0).set("fill", Data.array_of_multipoles_objects[this.name][index_of_group].zakladnaFarba);
+      Data.array_of_multipoles_objects[this.name][0].item(0).set("fill", Data.array_of_multipoles_objects[this.name][index_of_group].main_color);
 
       Data.canvas.remove(Data.label);
       Data.canvas.renderAll();
 
-
     });
-
-
 
   }
 
 
-
-  //pridanie novej hrany, suradnice polyline sa vypocitavaju podla toho kolko ma multipol vytrcajucich hran
   execute() {
     const points = [];
 
@@ -110,13 +105,13 @@ export class EdgeCommand implements Command{
 
       this.set_positions_of_polyline_multipol(this.first,points);
       let index_of_group = Data.array_of_multipoles_objects[this.first.multipol].length-1;
-      Data.array_of_multipoles_objects[this.first.multipol][0].item(0).set("fill",Data.array_of_multipoles_objects[this.first.multipol][index_of_group].farbaSpojenia);
+      Data.array_of_multipoles_objects[this.first.multipol][0].item(0).set("fill",Data.array_of_multipoles_objects[this.first.multipol][index_of_group].static_color);
 
     }
 
     else {
-      this.first.item(0).set("fill",this.first.farbaSpojenia);
-      this.first.set("aktualnaFarba",this.first.farbaSpojenia);
+      this.first.item(0).set("fill",this.first.static_color);
+      this.first.set("now_color",this.first.static_color);
       points.push(new fabric.Point(this.first.left + 32.5, this.first.top + 32.5));
     }
 
@@ -130,63 +125,49 @@ export class EdgeCommand implements Command{
 
       this.set_positions_of_polyline_multipol(this.second,points);
       let index_of_group = Data.array_of_multipoles_objects[this.second.multipol].length-1;
-      Data.array_of_multipoles_objects[this.second.multipol][0].item(0).set("fill",Data.array_of_multipoles_objects[this.second.multipol][index_of_group].farbaSpojenia);
+      Data.array_of_multipoles_objects[this.second.multipol][0].item(0).set("fill",Data.array_of_multipoles_objects[this.second.multipol][index_of_group].static_color);
 
     }
     else {
-      this.second.item(0).set("fill",this.second.farbaSpojenia);
-      this.second.set("aktualnaFarba",this.second.farbaSpojenia);
+      this.second.item(0).set("fill",this.second.static_color);
+      this.second.set("now_color",this.second.static_color);
       points.push(new fabric.Point(this.second.left + 32.5, this.second.top + 32.5));
     }
-
-
     this.create_polyline(points);
-
-
 
   }
 
 
-  //odstrani hranu a podla toho kolko ma multipol este ku sebe pripojenych hran, ak tych hran je 0 tak mu nastavime to ze doubleclickom s nim mozme opat hybat
   unexecute() {
     Data.canvas.remove(this.polyLine);
     let index = Data.edges_in_graph.indexOf(this.edgeJS);
     if (index !== -1) Data.edges_in_graph.splice(index, 1);
  
-    this.first.set("pocetHran",this.first.pocetHran-1);
-    this.second.set("pocetHran",this.second.pocetHran-1);
-    //prepocet kolko hran vedie z vchola a podla toho mu umoznime sa hybat
-    if(this.first.pocetHran == 0 && this.first.type == "vertex"){
+    this.first.set("edges",this.first.edges-1);
+    this.second.set("edges",this.second.edges-1);
+
+    if(this.first.edges == 0 && this.first.type == "vertex"){
       this.make_vertex_moveable(this.first);
 
     }
-    if(this.second.pocetHran == 0 && this.second.type == "vertex") {
+    if(this.second.edges == 0 && this.second.type == "vertex") {
       this.make_vertex_moveable(this.second);
     }
 
-    //prepocet kolko hran ide z multipola a podla toho pridavame doublecklick na stred multipola
     if(this.first.type == "fakeVrchol"){
       Data.canvas.add(this.first);
-
-
       if(this.how_many_edges_multipol_has(this.first.multipol) == 0){
         this.multipol_becomes_moveable(this.first.multipol);
       }
     }
 
-    //prepocet kolko hran ide z multipola a podla toho pridavame doublecklick na stred multipola
     if(this.second.type == "fakeVrchol"){
       Data.canvas.add(this.second);
-
       if(this.how_many_edges_multipol_has(this.second.multipol) == 0){
         this.multipol_becomes_moveable(this.second.multipol);
       }
 
-
-
     }
-
-
 
   }
 }

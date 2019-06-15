@@ -42,10 +42,10 @@ export class Multipol2Command implements Command{
     this.group.lockScalingX=true;
     this.group.lockScalingY=true;
     this.group.lockRotation=true;
-    this.group.set("farbaSpojenia","#7F9900");
-    this.group.set("zakladnaFarba","#99FF33");
-    this.multipol.set("suradnicaLeft",this.group.left);
-    this.multipol.set("suradnicaTop",this.group.top);
+    this.group.set("static_color","#7F9900");
+    this.group.set("main_color","#99FF33");
+    this.multipol.set("positionLeft",this.group.left);
+    this.multipol.set("positionTop",this.group.top);
   }
 
   add_doubleclick_to_moveable_multipol(){
@@ -54,11 +54,11 @@ export class Multipol2Command implements Command{
       const top = this.top;
 
       for(let i=0;i<3;i++){
-        this.item(i).set("suradnicaLeft",left);
-        this.item(i).set("suradnicaTop",top);
+        this.item(i).set("positionLeft",left);
+        this.item(i).set("positionTop",top);
         Data.canvas.add(this.item(i));
       }
-      this.item(0).item(0).set("fill",this.farbaSpojenia);
+      this.item(0).item(0).set("fill",this.static_color);
       Data.name_of_active_object.set("fill","transparent");
       Data.canvas.remove(this);
       Data.canvas.renderAll();
@@ -71,9 +71,9 @@ export class Multipol2Command implements Command{
         Data.canvas.remove(Data.array_of_multipoles_objects[this.name][i]);
       }
 
-      Data.array_of_multipoles_objects[this.name][3].set("left",this.suradnicaLeft);
-      Data.array_of_multipoles_objects[this.name][3].set("top",this.suradnicaTop);
-      this.item(0).set("fill",Data.array_of_multipoles_objects[this.name][3].zakladnaFarba);
+      Data.array_of_multipoles_objects[this.name][3].set("left",this.positionLeft);
+      Data.array_of_multipoles_objects[this.name][3].set("top",this.positionTop);
+      this.item(0).set("fill",Data.array_of_multipoles_objects[this.name][3].main_color);
       Data.canvas.add(Data.array_of_multipoles_objects[this.name][3]);
 
       Data.canvas.remove(Data.label);
@@ -108,8 +108,8 @@ export class Multipol2Command implements Command{
     let fake2JS = {"type":"multipol","id":this.id.toString(),"dangling_edge":this.fake2.name};
 
 
-    this.fake1.set("reprezentaciaJS",fake1JS);
-    this.fake2.set("reprezentaciaJS",fake2JS);
+    this.fake1.set("representationJS",fake1JS);
+    this.fake2.set("representationJS",fake2JS);
   }
 
   create_center_of_multipol(id,type){
@@ -135,10 +135,10 @@ export class Multipol2Command implements Command{
     this.multipol.addWithUpdate(circle);
     this.multipol.addWithUpdate(text);
     this.multipol.set("type","multipol");
-    this.multipol.set("vypis",type);
+    this.multipol.set("text_for_label",type);
     this.multipol.set("left",100);
     this.multipol.set("top",200);
-    this.multipol.set("name",this.id); // tu mozno radse id.toString()
+    this.multipol.set("name",this.id);
     this.multipol.lockMovementX=true;
     this.multipol.lockMovementY=true;
   }
@@ -150,47 +150,47 @@ export class Multipol2Command implements Command{
 
     Data.array_of_multipoles_objects[this.id] = this.array;
     for(let i=1;i<3;i++){
-      this.array[i].set("suradnicaLeft",this.group.left);
-      this.array[i].set("suradnicaTop",this.group.top);
-      this.array[i].set("zakladnaFarba","pink");
+      this.array[i].set("positionLeft",this.group.left);
+      this.array[i].set("positionTop",this.group.top);
+      this.array[i].set("main_color","pink");
       this.array[i].set("type","fakeVrchol");
-      this.array[i].set("pocetHran",0);
+      this.array[i].set("edges",0);
       this.array[i].set("multipol",this.id);
       this.array[i].lockMovementX=true;
       this.array[i].lockMovementY=true;
-      this.array[i].set("typ_multipola","multipol2");
+      this.array[i].set("multipol_type","multipol2");
     }
 
   }
 
 
-//pridanie multipola na plochu
+
   execute() {
     if(this.first_time){
       Data.canvas.add(this.group);
       this.first_time=false;
     }
     else {
-      Data.array_of_multipoles_objects[this.multipol.name][3].set("left",this.multipol.suradnicaLeft);
-      Data.array_of_multipoles_objects[this.multipol.name][3].set("top",this.multipol.suradnicaTop);
+      Data.array_of_multipoles_objects[this.multipol.name][3].set("left",this.multipol.positionLeft);
+      Data.array_of_multipoles_objects[this.multipol.name][3].set("top",this.multipol.positionTop);
 
       for (let i = 0; i < Data.array_of_multipoles_objects[this.group.name].length-1; i++) {
         Data.canvas.add(Data.array_of_multipoles_objects[this.group.name][i]);
       }
-      this.multipol.item(0).set("fill",this.group.farbaSpojenia);
+      this.multipol.item(0).set("fill",this.group.static_color);
     }
     Data.multipoles_in_graph.push(this.multipolJS);
   }
 
-//odobratie multipola z plochy
+
   unexecute() {
     Data.canvas.remove(this.group);
     const left = this.group.left;
     const top = this.group.top;
 
     for(let i=0;i<3;i++){
-      this.group.item(i).set("suradnicaLeft",left);
-      this.group.item(i).set("suradnicaTop",top);
+      this.group.item(i).set("positionLeft",left);
+      this.group.item(i).set("positionTop",top);
     }
 
     for(var i=0; i<Data.array_of_multipoles_objects[this.group.name].length-1; i++){

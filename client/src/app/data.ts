@@ -1,4 +1,4 @@
-import {Command} from './Commandy/command';
+import {Command} from './Commands/command';
 
 
 export class Data {
@@ -12,7 +12,7 @@ export class Data {
   static multipoles_in_graph:Array<any>;         //pole multipolov reprezentujucich ako jsony
   static edges_in_graph:Array<any>;             //pole hran reprezentujucich ako jsony
   static vertices_in_graph:Array<any>;        //pole vrcholov reprezentujucich ako jsony
-  static multipoles_for_use = [];     //pole multipolov ktore dostanem od servera
+  static multipoles_for_use:Array<any>;     //pole multipolov ktore dostanem od servera
   static name_of_active_object:any;
   static redoBooelan: any;
   static label: any;

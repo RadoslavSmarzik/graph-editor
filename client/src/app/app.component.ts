@@ -1,13 +1,13 @@
 import {Component, OnInit} from '@angular/core';
 import {fabric} from 'fabric';
-import {VertexCommand} from './Commandy/vertex-command';
+import {VertexCommand} from './Commands/vertex-command';
 import {Data} from './data';
-import {EdgeCommand} from './Commandy/edge-command';
-import {Multipol4Command} from './Commandy/multipol4-command';
-import {Multipol3Command} from './Commandy/multipol3-command';
-import {Multipol2Command} from './Commandy/multipol2-command';
+import {EdgeCommand} from './Commands/edge-command';
+import {Multipol4Command} from './Commands/multipol4-command';
+import {Multipol3Command} from './Commands/multipol3-command';
+import {Multipol2Command} from './Commands/multipol2-command';
 import * as $ from 'jquery';
-import {Multipol5Command} from './Commandy/multipol5-command';
+import {Multipol5Command} from './Commands/multipol5-command';
 
 
 
@@ -32,32 +32,13 @@ export class AppComponent implements OnInit {
 
 
   ngOnInit(): void {
-
-
     this.vertexName = 1;
     this.multipolName=1;
-   // Data.multipoles_for_use = [];
-    Data.redoBooelan = {redo:true};
-    this.disableRedo=Data.redoBooelan;
-    Data.codeDisable={disable:true};
-    this.disableCode=Data.codeDisable;
-    Data.multipolesNames=[];
-    Data.multipolesHidden=[];
-    for(let i=0;i<5;i++){
-      let hidden = {hidden:true};
-      let name = {name:""};
-      Data.multipolesNames.push(name);
-      Data.multipolesHidden.push(hidden);
-    }
-    this.nameMultipoles=Data.multipolesNames;
-    this.hideMultipoles=Data.multipolesHidden;
-
-
     this.canvas = new fabric.Canvas('myCanvas');
+    this. canvas.selection = false
     this.disableStart = false;
     this.disableStop = true;
     this.disableUndo = true;
-    this.disableRedo.redo=true;
     Data.state = 0;
     Data.commands=[];
     Data.array_of_multipoles_objects = new Array();
@@ -68,29 +49,30 @@ export class AppComponent implements OnInit {
     Data.vertices_in_graph = new Array<number>();
     Data.name_of_active_object = null;
     Data.graph_code  = null;
-
-
-
-
+    Data.multipoles_for_use = [];
+    Data.redoBooelan = {redo:true};
+    Data.codeDisable={disable:true};
+    Data.multipolesNames=[];
+    Data.multipolesHidden=[];
+    for(let i=0;i<5;i++){
+      let hidden = {hidden:true};
+      let name = {name:""};
+      Data.multipolesNames.push(name);
+      Data.multipolesHidden.push(hidden);
+    }
+    this.nameMultipoles=Data.multipolesNames;
+    this.hideMultipoles=Data.multipolesHidden;
+    this.disableRedo=Data.redoBooelan;
+    this.disableCode=Data.codeDisable;
 
     this.get_multipoles();
-    //nastavenie selektovania objektov na ploche, ked selektnem 2 vrcholy alebo 2 dagling_edge(alebo circle a dagling_edge) hned za sebou tak sa vytvori hrana
     this.set_selection_on_canvas();
-
-
-
-    //nastavovanie toho, ze ked prejdem nad nejakym objektom ukaze sa jeho id
     this.set_mouse_over_on_canvas();
     this.set_mouse_out_on_canvas();
-
-
-
-
   }
 
 
 
-  //skusam get a post a funkcie na pomocne vypisovanie hran, vrcholov a multipolov na konzolu, pri odovzdavani tieto funkcie zmazem
 
 
   set_mouse_out_on_canvas(){
@@ -127,7 +109,7 @@ export class AppComponent implements OnInit {
           const top = e.e.pageY;
           const left = e.e.pageX;
 
-          Data.label = new fabric.Text(e.target.vypis,{left: left -200,
+          Data.label = new fabric.Text(e.target.text_for_label,{left: left -200,
             top: top -120,
             fill:"white",
             backgroundColor: "black",
@@ -170,10 +152,6 @@ export class AppComponent implements OnInit {
 
 
 
-
-
-
-
   set_selection_on_canvas(){
     this.canvas.on("object:selected", function (e) {
       Data.selectedVertex = e.target;
@@ -189,9 +167,9 @@ export class AppComponent implements OnInit {
 
     this.canvas.on("selection:cleared", function () {
       if(Data.selectedVertex.type == "vertex"){
-        Data.selectedVertex.item(0).set("fill",Data.selectedVertex.aktualnaFarba);
+        Data.selectedVertex.item(0).set("fill",Data.selectedVertex.now_color);
       }
-      Data.selectedVertex.set("fill", Data.selectedVertex.zakladnaFarba);
+      Data.selectedVertex.set("fill", Data.selectedVertex.main_color);
       Data.firstVertex = null;
       Data.secondVertex = null;
 
@@ -200,14 +178,11 @@ export class AppComponent implements OnInit {
 
     this.canvas.on("selection:updated", function (e) {
       if(Data.selectedVertex.type == "vertex"){
-        Data.selectedVertex.item(0).set("fill",Data.selectedVertex.aktualnaFarba);
+        Data.selectedVertex.item(0).set("fill",Data.selectedVertex.now_color);
       }
-      Data.selectedVertex.set("fill", Data.selectedVertex.zakladnaFarba);
+      Data.selectedVertex.set("fill", Data.selectedVertex.main_color);
 
       const activeObject = e.target;
-      if(activeObject.type =="vertex") {
-        activeObject.item(0).set("fill", "#1E90FF");
-      }
 
       Data.selectedVertex = activeObject;
 
@@ -224,6 +199,9 @@ export class AppComponent implements OnInit {
         Data.state = Data.commands.length;
 
       }
+      if(activeObject.type =="vertex") {
+        activeObject.item(0).set("fill", "#1E90FF");
+      }
       Data.firstVertex = null;
       Data.secondVertex = null;
       Data.firstVertex = e.target;
@@ -235,7 +213,7 @@ export class AppComponent implements OnInit {
 
 
 
- //pridanie vrchola na plochu
+
   add_vertex(){
     this.disableUndo=false;
     this.disableRedo.redo = true;
@@ -252,7 +230,7 @@ export class AppComponent implements OnInit {
   }
 
 
-  //vykonva undo na pridavanie hran, multipolov a vrcholov
+
   undoMethod():void{
     Data.commands[Data.state-1].unexecute();
     Data.state--;
@@ -265,7 +243,6 @@ export class AppComponent implements OnInit {
 
   }
 
-  //vykonava redo na pridavanie hran, multipolov a vrcholov
   redoMethod():void{
     this.disableUndo=false;
     this.change_moveable_for_static();
@@ -286,11 +263,11 @@ export class AppComponent implements OnInit {
         let size = Data.array_of_multipoles_objects[obj.name].length-1;
 
         for(let i=0;i<size;i++){
-          obj.item(i).set("suradnicaLeft",left);
-          obj.item(i).set("suradnicaTop",top);
+          obj.item(i).set("positionLeft",left);
+          obj.item(i).set("positionTop",top);
           Data.canvas.add(obj.item(i));
         }
-        Data.array_of_multipoles_objects[obj.name][0].item(0).set("fill",obj.farbaSpojenia);
+        Data.array_of_multipoles_objects[obj.name][0].item(0).set("fill",obj.static_color);
         Data.canvas.remove(obj);
         Data.canvas.renderAll();
       }
@@ -300,14 +277,8 @@ export class AppComponent implements OnInit {
 
 
 
-
-  //fukcia, ktoru vyuzivaju buttony ktore sa ukazu az ked dostaneme zo servera pole multipolov, prida novy multipol na plochu
   add_multipol(n:number){
     let multipol;
-    /*if(Data.multipoles_for_use.length<n+1){  //mozem to dat teraz aj prec
-      console.log("multipoly nie su v databaze");
-      return;
-    }*/
     let dangling_edges = Data.multipoles_for_use[n][1];
     let type = Data.multipoles_for_use[n][0];
 
@@ -340,14 +311,10 @@ export class AppComponent implements OnInit {
 
   }
 
-  //zobrazenie kodu grafu
   graph_code(){
     alert(Data.graph_code);
   }
 
-  //Funkcie na komunikaciu so serverom
-
- //funkcia ktora zo servera vypyta pole multipolov a tieto multipoly si globalne ulozi, buttony ktore bude vyuzivat zmeni na viditelne a nastavi im mena podla polzky name
   get_multipoles(){
     const url = "http://localhost:8080/multipol";
     $.get(url,function(data, status){
@@ -379,9 +346,8 @@ export class AppComponent implements OnInit {
 
   }
 
-  //funkcia, ktora bude serveru posielat vsetky hrany, vrcholy a multipoly v grafe a dostane od servera sparse6 kod grafu
-  graph(){
 
+  graph(){
     const url="http://localhost:8080/graph";
     let data = {"vertices":Data.vertices_in_graph,"multipoles":Data.multipoles_in_graph,"edges":Data.edges_in_graph};
     console.log(data);
@@ -399,12 +365,10 @@ export class AppComponent implements OnInit {
 
   }
 
-  //funkcia ktora vypise vsetky invarianty ziskane od servera
+
   get_invariants(){
     const url="http://localhost:8080/invariants";
     let data = Data.graph_code;
-
-
     $.get(url, data,function(data, status){
       if(status = "success") {
         let result = "";
@@ -420,7 +384,7 @@ export class AppComponent implements OnInit {
 
   }
 
-  //funkcia aby sa nam nakopiroval kod grafu
+
   copy_code(){
       let selBox = document.createElement('textarea');
       selBox.style.position = 'fixed';
@@ -433,12 +397,8 @@ export class AppComponent implements OnInit {
       selBox.select();
       document.execCommand('copy');
       document.body.removeChild(selBox);
-
   }
 
-
-
-  // Function to download data to a file
   download(filename, type) {
     let data = Data.graph_code;
     var file = new Blob([data], {type: type});
@@ -457,9 +417,6 @@ export class AppComponent implements OnInit {
       }, 0);
     }
   }
-
-
-
 
 
 }
