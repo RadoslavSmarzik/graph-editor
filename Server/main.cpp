@@ -12,11 +12,14 @@
 #include <path_decomposition/shortest_path_heuristic.hpp>
 #include <snarks/colouring_pd.hpp>*/ 
 
+//#include <algorithms.hpp>//
 #include <basic_impl.hpp>
 #include <invariants.hpp>
 #include <graphs.hpp>
 #include <operations.hpp>
 #include <io.hpp>
+//#include <algorithms/cyclic_connectivity.hpp>//
+
 
 #include <config/configuration.hpp>
 #include <util/json.hpp>
@@ -25,9 +28,10 @@
 #include "request.h"
 
 #include <cassert>
-#include <sstream>
 #include <iomanip>
 
+#include <sstream>
+#include <stdexcept>
 #include <unistd.h> 
 #include <stdio.h> 
 #include <sys/socket.h> 
@@ -44,6 +48,44 @@ using namespace std;
 using namespace ba_graph;
 using namespace httpparser;
 
+struct Response {																				//
+	int versionMajor = 1;
+    int versionMinor = 1;
+	unsigned int statusCode1 = 200;
+	unsigned int statusCode2 = 404;
+    std::string status1 = "OK";
+	std::string status2 = "NOT FOUND";
+	std::vector<pair<std::string, std::string>> headers = {{ "Access-Control-Allow-Origin", "http://localhost:4200" }};	
+};	
+
+std::string make_response(int num, std::string cType, std::string content = ""){
+	Response res;
+	if(cType == "plain"){
+		res.headers.push_back({ "Content-Type", "text/plain" });
+	}else if(cType == "json"){
+		res.headers.push_back({ "Content-Type", "application/json" });
+	}else if(cType == "html"){
+		res.headers.push_back({ "Content-Type", "text/html" });
+	}
+	std::stringstream stream;
+	if(num == 1){
+		stream << "HTTPS/" << res.versionMajor << "." << res.versionMinor
+			   << " " << res.statusCode1 << " " << res.status1 << "\n";
+		for(pair<std::string, std::string> i : res.headers) {
+			stream << i.first << ": " << i.second << "\n";
+		}
+		stream << "\n" << content;
+	}else if(num == 2){
+		stream << "HTTPS/" << res.versionMajor << "." << res.versionMinor
+			   << " " << res.statusCode2 << " " << res.status2 << "\n";
+		for(pair<std::string, std::string> i : res.headers) {
+			stream << i.first << ": " << i.second << "\n";
+		}
+		stream << "\n" << "<html><body>NOT FOUND</body></html>";									//treba aj davat body?
+	}
+	return stream.str();
+}	
+
 json datab_mult(){
 	std::ifstream in("array_of_multipoles.txt");
 	json m;
@@ -52,14 +94,14 @@ json datab_mult(){
 	return m;
 }
 
-/*class GraphBuilder{
+class GraphBuilder{									//nefunguje gtools.h
 	
-	Graph g = createG();       	
+	Graph g = createG();       						//nefunguje, treba dat vytvorit ten graf az v tom make_graph alebo to uz sparsovat v tej funkcii a potom poslat string
 	json info;
 	json m;
 	std::map<int, Number> map_of_vert;
 	std::map<pair<int, std::string>, Number> map_of_mult;
-	int c = 0;//Number, moze byt aj int skusal som  int
+	int c = 0;
 	
 	public:
 	GraphBuilder(json data){
@@ -83,22 +125,21 @@ json datab_mult(){
 					int id = std::stoi(e["id"].get<std::string>());
 					for (auto& k : j["dangling_edges_mapping"]) {
 						for (auto& l : k.items()) {
-							//string v = 
-							c++;//
-							map_of_mult[{ id, l.key() }] = c + min_n;  			//asi std::stoi(l.value().get<std::string>());
+							//c++;
+							int value = std::stoi(l.value().get<std::string>());
+							map_of_mult[{ id, l.key() }] = min_n + value;  							//c
 						}	
 					}						
 					break;
 				}	
 			}
 		}	
-		
 		for (auto& e : info["edges"]) {
 			if(e["first"]["type"] == "multipol" && e["second"]["type"] == "vertex"){
 				int index1 = std::stoi(e["first"]["id"].get<std::string>());
 				std::string index2 = e["first"]["dangling_edge"].get<std::string>();
 				Number vertex1 = map_of_vert[std::stoi(e["second"]["id"].get<std::string>())];
-				Number vertex2 = map_of_mult[{ index1, index2 }];								//moze byt aj int ?	
+				Number vertex2 = map_of_mult[{ index1, index2 }];	
 				identify_vertices(g, vertex1, vertex2); 
 			}else if(e["second"]["type"] == "multipol" && e["first"]["type"] == "vertex"){
 				int index1 = std::stoi(e["second"]["id"].get<std::string>());
@@ -116,18 +157,16 @@ json datab_mult(){
 				identify_vertices(g, vertex1, vertex2);
 				suppress_vertex(g, vertex1);
 			}else if(e["first"]["type"] == "vertex" && e["second"]["type"] == "vertex"){
-				int v1 = std::stoi(e["first"]["id"].get<std::string>(););
-				int v2 = std::stoi(e["second"]["id"].get<std::string>(););
+				int v1 = std::stoi(e["first"]["id"].get<std::string>());
+				int v2 = std::stoi(e["second"]["id"].get<std::string>());
 				addE(g, Location(map_of_vert[v1], map_of_vert[v2]));
 			}else{	
-				string str="HTTPS/1.1 404 NOT FOUND\nAccess-Control-Allow-Origin: http://localhost:4200\nContent-Type: text/html\n\n<html><body>NOT FOUND</body></html>";
-				const char * resp = str.c_str();
-				send(new_socket, resp, strlen(resp), 0);			
+				throw std::invalid_argument( "received bad type" );			
 			}
 		}
 		return g;
 	}
-};*/
+};
 
 int main(int argc, char const *argv[]) {
 	
@@ -182,17 +221,23 @@ int main(int argc, char const *argv[]) {
 	if(request.method == "POST"){
 		if(request.uri.compare(0,6,"/graph")==0){
 			/*GraphBuilder gb(info);
-			Graph g = gb.make_graph();
-			
-			std::string s =	write_sparse6(g);
+			try {
+				Graph g = gb.make_graph();
+				std::string s =	write_sparse6(g);
 		
-			string str="HTTPS/1.1 200 OK\nAccess-Control-Allow-Origin: http://localhost:4200\nContent-Type: text/plain\n\n" + s;
-			const char * resp = str.c_str();
-			send(new_socket, resp, strlen(resp), 0);*/
+				std::string str = make_response(1, "plain", s);
+				const char * resp = str.c_str();
+				send(new_socket, resp, strlen(resp), 0);
+			}
+			catch( const std::invalid_argument& e ) {
+				std::string str = make_response(2, "html");
+				const char * resp = str.c_str();
+				send(new_socket, resp, strlen(resp), 0);				
+			}*/
 		}else if (request.uri.compare(0,6,"/close")==0){//
 			//break;//
 		}else{
-			string str="HTTPS/1.1 404 NOT FOUND\nAccess-Control-Allow-Origin: http://localhost:4200\nContent-Type: text/html\n\n<html><body>NOT FOUND</body></html>"; //treba aj davat telo ?
+			string str = make_response(2, "html");													 
 			const char * resp = str.c_str();
 			send(new_socket, resp, strlen(resp), 0);		
 		}
@@ -200,22 +245,28 @@ int main(int argc, char const *argv[]) {
 		if(request.uri.compare(0,9,"/multipol")==0){
 			json m = datab_mult();
 			std::string s = m.dump();
-					
-			string str="HTTPS/1.1 200 OK\nAccess-Control-Allow-Origin: http://localhost:4200\nContent-Type: application/json\n\n" + s;
+				
+			std::string str = make_response(1, "json", s);
 			const char * resp = str.c_str();
 			send(new_socket, resp, strlen(resp), 0);	
 		}else if (request.uri.compare(0,11,"/invariants")==0){
-			/*Graph g = read_sparse6(data);
-			json h;
-			h["girth"]=girth(g);
-			max_deg;
-			min_deg;
-			ak su 3 aj max a min tak cyclic_connectivity;
-			std::string s = m.dump();*/
+			/*Graph g = read_sparse6(data.begin(), data.end());						
+			json invariants;
+			invariants["girth"] = girth(g);                                		//netreba to dat do uvodzoviek ?
+			invariants["max_deg"] = max_deg(g);
+			invariants["min_deg"] = min_deg(g);
+			if(invariants["max_deg"] == 3 && invariants["min_deg"] == 3){
+				invariants["cyclic_connectivity"] = cyclic_connectivity(g);
+			}	
+			
+			std::string s = invariants.dump();
+			std::string str = make_response(1, "json", s);							// typ json ?
+			const char * resp = str.c_str();
+			send(new_socket, resp, strlen(resp), 0);*/
 		}else if (request.uri.compare(0,6,"/close")==0){//
 			//break;//
 		}else{
-			string str="HTTPS/1.1 404 NOT FOUND\nAccess-Control-Allow-Origin: http://localhost:4200\nContent-Type: text/html\n\n<html><body>NOT FOUND</body></html>";
+			string str = make_response(2, "html");
 			const char * resp = str.c_str();
 			send(new_socket, resp, strlen(resp), 0);		
 		}
