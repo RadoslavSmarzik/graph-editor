@@ -1,4 +1,4 @@
-import { Multipol2Command } from './multipol2-command';
+import {Multipol2Command} from './multipol2-command';
 
 describe('Multipol2Command', () => {
   it('should create an instance', () => {

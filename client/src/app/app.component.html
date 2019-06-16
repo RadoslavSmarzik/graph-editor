@@ -1,42 +1,64 @@
 <h1>Graph editor</h1>
 
 <div id="flex">
-  <ul class ="inner">
+  <ul class="inner">
 
-     <li><button (click)="add_vertex()">VERTEX</button></li>
-    <li><button class="multipoly" (click)="add_multipol(0)" [hidden]="hideMultipoles[0].hidden">{{nameMultipoles[0].name}}</button></li>
-    <li><button class="multipoly" (click)="add_multipol(1)" [hidden]="hideMultipoles[1].hidden">{{nameMultipoles[1].name}}</button></li>
-    <li><button class="multipoly" (click)="add_multipol(2)" [hidden]="hideMultipoles[2].hidden">{{nameMultipoles[2].name}}</button></li>
-    <li><button class="multipoly" (click)="add_multipol(3)" [hidden]="hideMultipoles[3].hidden">{{nameMultipoles[3].name}}</button></li>
-    <li><button class="multipoly" (click)="add_multipol(4)" [hidden]="hideMultipoles[4].hidden">{{nameMultipoles[4].name}}</button></li>
+    <li>
+      <button (click)="add_vertex()">VERTEX</button>
+    </li>
+    <li>
+      <button class="multipoly" (click)="add_multipol(0)"
+              [hidden]="hideMultipoles[0].hidden">{{nameMultipoles[0].name}}</button>
+    </li>
+    <li>
+      <button class="multipoly" (click)="add_multipol(1)"
+              [hidden]="hideMultipoles[1].hidden">{{nameMultipoles[1].name}}</button>
+    </li>
+    <li>
+      <button class="multipoly" (click)="add_multipol(2)"
+              [hidden]="hideMultipoles[2].hidden">{{nameMultipoles[2].name}}</button>
+    </li>
+    <li>
+      <button class="multipoly" (click)="add_multipol(3)"
+              [hidden]="hideMultipoles[3].hidden">{{nameMultipoles[3].name}}</button>
+    </li>
+    <li>
+      <button class="multipoly" (click)="add_multipol(4)"
+              [hidden]="hideMultipoles[4].hidden">{{nameMultipoles[4].name}}</button>
+    </li>
 
 
-
-
-
-
-    <li><button (click)="graph()">SEND GRAPH</button></li>
-    <li><button (click)="graph_code()" [disabled]="disableCode.disable">SHOW GRAPH CODE</button></li>
-    <li><button (click)="copy_code()" [disabled]="disableCode.disable">COPY GRAPH CODE</button></li>
-    <li><button (click)="download('graph.txt','text/plain')" [disabled]="disableCode.disable">DOWNLOAD CODE</button></li>
-    <li><button (click)="get_invariants()" [disabled]="disableCode.disable">INVARIANTS</button></li>
-
-
-
-
-
+    <li>
+      <button (click)="graph()">SEND GRAPH</button>
+    </li>
+    <li>
+      <button (click)="graph_code()" [disabled]="disableCode.disable">SHOW GRAPH CODE</button>
+    </li>
+    <li>
+      <button (click)="copy_code()" [disabled]="disableCode.disable">COPY GRAPH CODE</button>
+    </li>
+    <li>
+      <button (click)="download('graph.txt','text/plain')" [disabled]="disableCode.disable">DOWNLOAD CODE</button>
+    </li>
+    <li>
+      <button (click)="get_invariants()" [disabled]="disableCode.disable">INVARIANTS</button>
+    </li>
 
 
     <br>
     <br>
     <br>
-    <li><button (click)="undoMethod()" [disabled]="disableUndo" >UNDO</button></li>
-    <li><button (click)="redoMethod()" [disabled]="disableRedo.redo">REDO</button></li>
+    <li>
+      <button (click)="undoMethod()" [disabled]="disableUndo">UNDO</button>
+    </li>
+    <li>
+      <button (click)="redoMethod()" [disabled]="disableRedo.redo">REDO</button>
+    </li>
 
 
-   </ul>
+  </ul>
 
-   <canvas width="1600" height="800" id="myCanvas"></canvas>
+  <canvas width="1600" height="800" id="myCanvas"></canvas>
 
- </div>
+</div>
 

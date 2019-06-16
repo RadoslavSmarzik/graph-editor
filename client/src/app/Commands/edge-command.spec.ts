@@ -1,4 +1,4 @@
-import { EdgeCommand } from './edge-command';
+import {EdgeCommand} from './edge-command';
 
 describe('EdgeCommand', () => {
   it('should create an instance', () => {
