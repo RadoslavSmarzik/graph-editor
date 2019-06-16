@@ -1,1 +1,26 @@
-/* You can add global styles to this file, and also import other style files */
+button {
+  background-color: dodgerblue;
+  margin-right: 15px;
+  padding: 10px;
+  font-weight: bold;
+  width:150px;
+  font-size: 20px;
+  font-family: 'Roboto', sans-serif;
+}
+button:hover{
+  color:white;
+  padding:15px;
+  width:160px;
+  background-color: blue;
+
+}
+
+button:disabled{
+  background-color:lightblue;
+  color:white;
+}
+button:disabled:hover{
+  padding: 10px;
+  width: 150px;
+
+}
