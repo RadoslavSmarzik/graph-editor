@@ -6,27 +6,7 @@
     <li>
       <button (click)="add_vertex()">VERTEX</button>
     </li>
-    <li>
-      <button class="multipoly" (click)="add_multipol(0)"
-              [hidden]="hideMultipoles[0].hidden">{{nameMultipoles[0].name}}</button>
-    </li>
-    <li>
-      <button class="multipoly" (click)="add_multipol(1)"
-              [hidden]="hideMultipoles[1].hidden">{{nameMultipoles[1].name}}</button>
-    </li>
-    <li>
-      <button class="multipoly" (click)="add_multipol(2)"
-              [hidden]="hideMultipoles[2].hidden">{{nameMultipoles[2].name}}</button>
-    </li>
-    <li>
-      <button class="multipoly" (click)="add_multipol(3)"
-              [hidden]="hideMultipoles[3].hidden">{{nameMultipoles[3].name}}</button>
-    </li>
-    <li>
-      <button class="multipoly" (click)="add_multipol(4)"
-              [hidden]="hideMultipoles[4].hidden">{{nameMultipoles[4].name}}</button>
-    </li>
-
+    <div id="myDIV"></div>
 
     <li>
       <button (click)="graph()">SEND GRAPH</button>
@@ -49,7 +29,7 @@
     <br>
     <br>
     <li>
-      <button (click)="undoMethod()" [disabled]="disableUndo">UNDO</button>
+      <button (click)="undoMethod()" [disabled]="disableUndo.undo">UNDO</button>
     </li>
     <li>
       <button (click)="redoMethod()" [disabled]="disableRedo.redo">REDO</button>

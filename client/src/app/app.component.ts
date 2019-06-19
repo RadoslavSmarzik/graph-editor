@@ -20,23 +20,18 @@ export class AppComponent implements OnInit {
   canvas: any;
   disableStart: Boolean;
   disableStop: Boolean;
-  disableUndo: Boolean;
+  disableUndo: any;
   disableRedo: any;
   vertexName: number;
-  multipolName: number;
   disableCode: Boolean;
-  hideMultipoles: any;
-  nameMultipoles: any;
 
 
   ngOnInit(): void {
     this.vertexName = 1;
-    this.multipolName = 1;
     this.canvas = new fabric.Canvas('myCanvas');
     this.canvas.selection = false;
     this.disableStart = false;
     this.disableStop = true;
-    this.disableUndo = true;
     Data.state = 0;
     Data.commands = [];
     Data.array_of_multipoles_objects = new Array();
@@ -49,19 +44,13 @@ export class AppComponent implements OnInit {
     Data.graph_code = null;
     Data.multipoles_for_use = [];
     Data.redoBooelan = {redo: true};
+    Data.undoBooelan = {undo: true};
     Data.codeDisable = {disable: true};
-    Data.multipolesNames = [];
-    Data.multipolesHidden = [];
-    for (let i = 0; i < 5; i++) {
-      let hidden = {hidden: true};
-      let name = {name: ''};
-      Data.multipolesNames.push(name);
-      Data.multipolesHidden.push(hidden);
-    }
-    this.nameMultipoles = Data.multipolesNames;
-    this.hideMultipoles = Data.multipolesHidden;
+    Data.multipolName = 1;
+
     this.disableRedo = Data.redoBooelan;
     this.disableCode = Data.codeDisable;
+    this.disableUndo = Data.undoBooelan;
 
     this.get_multipoles();
     this.set_selection_on_canvas();
@@ -206,7 +195,7 @@ export class AppComponent implements OnInit {
 
 
   add_vertex() {
-    this.disableUndo = false;
+    this.disableUndo.undo = false;
     this.disableRedo.redo = true;
     const command = new VertexCommand(this.canvas, this.vertexName);
     while (Data.commands.length > Data.state) {
@@ -226,7 +215,7 @@ export class AppComponent implements OnInit {
     Data.state--;
     this.disableRedo.redo = false;
     if (Data.state == 0) {
-      this.disableUndo = true;
+      this.disableUndo.undo = true;
     }
     Data.codeDisable.disable = true;
 
@@ -234,7 +223,7 @@ export class AppComponent implements OnInit {
   }
 
   redoMethod(): void {
-    this.disableUndo = false;
+    this.disableUndo.undo = false;
     this.change_moveable_for_static();
     Data.commands[Data.state].execute();
     Data.state++;
@@ -266,63 +255,64 @@ export class AppComponent implements OnInit {
   }
 
 
-  add_multipol(n: number) {
-    let multipol;
-    let dangling_edges = Data.multipoles_for_use[n][1];
-    let type = Data.multipoles_for_use[n][0];
-
-    if (dangling_edges.length == 2) {
-      multipol = new Multipol2Command(this.multipolName, dangling_edges[0], dangling_edges[1], type);
-    }
-    if (dangling_edges.length == 3) {
-      multipol = new Multipol3Command(this.multipolName, dangling_edges[0], dangling_edges[1], dangling_edges[2], type);
-
-    }
-    if (dangling_edges.length == 4) {
-      multipol = new Multipol4Command(this.multipolName, dangling_edges[0], dangling_edges[1], dangling_edges[2], dangling_edges[3], type);
-
-    }
-    if (dangling_edges.length == 5) {
-      multipol = new Multipol5Command(this.multipolName, dangling_edges[0], dangling_edges[1], dangling_edges[2], dangling_edges[3], dangling_edges[4], type);
-
-    }
-    if (dangling_edges.length == 6) {
-      multipol = new Multipol6Command(this.multipolName, dangling_edges[0], dangling_edges[1], dangling_edges[2], dangling_edges[3], dangling_edges[4], dangling_edges[5], type);
-
-    }
-
-    this.disableUndo = false;
-    this.disableRedo.redo = true;
-    this.multipolName++;
-    while (Data.commands.length > Data.state) {
-      Data.commands.pop();
-    }
-    multipol.execute();
-    Data.commands.push(multipol);
-    Data.state = Data.commands.length;
-    Data.codeDisable.disable = true;
-
-  }
-
   graph_code() {
     alert(Data.graph_code);
   }
 
   get_multipoles() {
+    let index = 0;
     const url = 'http://localhost:8080/multipol';
     $.get(url, function (data, status) {
-      if (status = 'success') {
+      if (status == 'success') {
         for (let i = 0; i < data.length; i++) {
-          let info_about_multipol = [];
-          info_about_multipol.push(data[i]['name']);
-          info_about_multipol.push(data[i]['dangling_edges']); //mozno dangling_edges
-          Data.multipoles_for_use.push(info_about_multipol);
-        }
+          let btn = document.createElement('BUTTON');
+          let text = document.createTextNode(data[i]['name']);
+
+          btn.setAttribute('style', 'font-size:15px');
 
 
-        for (let i = 0; i < Data.multipoles_for_use.length; i++) {
-          Data.multipolesNames[i].name = Data.multipoles_for_use[i][0];
-          Data.multipolesHidden[i].hidden = false;
+          btn.appendChild(text);
+
+          document.getElementById('myDIV').appendChild(btn);
+
+          btn.onclick = function () {
+            let multipol;
+            let dangling_edges = data[i]['dangling_edges'];
+            let type = data[i]['name'];
+
+            if (dangling_edges.length == 2) {
+              multipol = new Multipol2Command(Data.multipolName, dangling_edges[0], dangling_edges[1], type);
+            }
+            if (dangling_edges.length == 3) {
+              multipol = new Multipol3Command(Data.multipolName, dangling_edges[0], dangling_edges[1], dangling_edges[2], type);
+
+            }
+            if (dangling_edges.length == 4) {
+              multipol = new Multipol4Command(Data.multipolName, dangling_edges[0], dangling_edges[1], dangling_edges[2], dangling_edges[3], type);
+
+            }
+            if (dangling_edges.length == 5) {
+              multipol = new Multipol5Command(Data.multipolName, dangling_edges[0], dangling_edges[1], dangling_edges[2], dangling_edges[3], dangling_edges[4], type);
+
+            }
+            if (dangling_edges.length == 6) {
+              multipol = new Multipol6Command(Data.multipolName, dangling_edges[0], dangling_edges[1], dangling_edges[2], dangling_edges[3], dangling_edges[4], dangling_edges[5], type);
+
+            }
+            Data.multipolName++;
+            Data.undoBooelan.undo = false;
+            Data.redoBooelan.redo = true;
+
+
+            while (Data.commands.length > Data.state) {
+              Data.commands.pop();
+            }
+            multipol.execute();
+            Data.commands.push(multipol);
+            Data.state = Data.commands.length;
+            Data.codeDisable.disable = true;
+          };
+          index++;
         }
       } else {
         alert('error');
@@ -332,8 +322,7 @@ export class AppComponent implements OnInit {
 
       .fail(function () {
         alert('Try refresh');
-      })
-    ;
+      });
 
 
   }
@@ -342,6 +331,7 @@ export class AppComponent implements OnInit {
   graph() {
     const url = 'http://localhost:8080/graph';
     let data = {'vertices': Data.vertices_in_graph, 'multipoles': Data.multipoles_in_graph, 'edges': Data.edges_in_graph};
+
 
     $.ajax({
       url: url,
@@ -371,26 +361,24 @@ export class AppComponent implements OnInit {
     const url = 'http://localhost:8080/invariants';
     let data = Data.graph_code;
 
-    $.ajax({
-      url: url,
-      method: 'GET',
-      data: JSON.stringify(data),
-      contentType: 'text/plain',
-      dataType: 'text',
-      crossDomain: true,
-      success: function (data) {
+    $.get(url,data, function (data, status) {
+      if (status == 'success') {
         let result = '';
         $.each(data, function (key, value) {
           result += key + ': ' + value + '\n';
         });
         alert(result);
 
-      },
-      error: function (data) {
+      } else {
         alert('error');
-
       }
-    });
+
+    })
+
+      .fail(function () {
+        alert('error');
+      })
+    ;
 
   }
 

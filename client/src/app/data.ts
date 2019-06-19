@@ -17,9 +17,9 @@ export class Data {
   static redoBooelan: any;
   static label: any;
   static graph_code: any;
-  static multipolesHidden: any;
-  static multipolesNames: any;
   static codeDisable: any;
+  static multipolName:number;
+  static undoBooelan: any;
 
 
 }
