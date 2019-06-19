@@ -349,25 +349,20 @@ export class AppComponent implements OnInit {
       method: 'POST',
       data: JSON.stringify(data),
       contentType: 'text/plain',
-      dataType: 'json',
+      dataType: 'text',
       crossDomain: true,
       success: function (data) {
         Data.graph_code = data;
         Data.codeDisable.disable = false;
 
+      },
+      error: function (data) {
+        alert('error');
+
+
       }
 
     });
-
-    /*$.post(url, data, function (data, status) {
-      if (status = 'success') {
-        Data.graph_code = data;
-        Data.codeDisable.disable = false;
-      }
-    })
-      .fail(function () {
-        alert('error');
-      });*/
 
 
   }
@@ -376,18 +371,27 @@ export class AppComponent implements OnInit {
   get_invariants() {
     const url = 'http://localhost:8080/invariants';
     let data = Data.graph_code;
-    $.get(url, data, function (data, status) {
-      if (status = 'success') {
+
+    $.ajax({
+      url: url,
+      method: 'POST',
+      data: JSON.stringify(data),
+      contentType: 'text/plain',
+      dataType: 'text',
+      crossDomain: true,
+      success: function (data) {
         let result = '';
         $.each(data, function (key, value) {
           result += key + ': ' + value + '\n';
         });
         alert(result);
-      }
-    })
-      .fail(function () {
+
+      },
+      error: function (data) {
         alert('error');
-      });
+
+      }
+    });
 
   }
 
