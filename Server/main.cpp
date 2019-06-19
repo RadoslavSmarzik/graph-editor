@@ -8,8 +8,6 @@
 
 /*#include <snarks/colouring_pd.hpp>
 #include <graphs/snarks.hpp>
-#include <random/random_graphs.hpp>
-#include <path_decomposition/shortest_path_heuristic.hpp>
 #include <snarks/colouring_pd.hpp>*/ 
 
 #include <basic_impl.hpp>
@@ -37,7 +35,7 @@
 #include <netinet/in.h> 
 #include <map>
 #include <vector>
-#include <string.h> 
+#include <string.h>
 #include <iostream> 
 
 #define PORT 8080 
@@ -46,25 +44,27 @@ using namespace std;
 using namespace ba_graph;
 using namespace httpparser;
 
-struct Response { 																		//
+struct Response { 																	
     int versionMajor = 1;
     int versionMinor = 1;
     unsigned int statusCode1 = 200;
     unsigned int statusCode2 = 404;
+	unsigned int statusCode3 = 400;
     std::string status1 = "OK";
-    std::string status2 = "NOT FOUND";
-    std::vector<pair<std::string, std::string>> headers = {{ "Access-Control-Allow-Origin", "http://localhost:4200"}};
+    std::string status2 = "Not Found";
+	std::string status3 = "Bad Request";
+    std::vector<pair<std::string, std::string>> headers = {{"Access-Control-Allow-Origin", "http://localhost:4200"}};
 };
 
-std::string make_response(int num, std::string cType, std::string content = "") {
+std::string make_response(int num, std::string cType = "", std::string content = "") {				//mozem mat dva nulove stringy ?
     Response res;
     if (cType == "plain") {
         res.headers.push_back({"Content-Type", "text/plain"});
     } else if (cType == "json") {
         res.headers.push_back({"Content-Type", "application/json"});
-    } else if (cType == "html") {
+    } /*else if (cType == "html") {
         res.headers.push_back({"Content-Type", "text/html"});
-    }
+    }*/
     std::stringstream stream;
     if (num == 1) {
         stream << "HTTPS/" << res.versionMajor << "." << res.versionMinor
@@ -81,7 +81,15 @@ std::string make_response(int num, std::string cType, std::string content = "") 
 		for (pair<std::string, std::string> i : res.headers) {
             stream << i.first << ": " << i.second << "\n";
         }
-        stream << "\n" << "<html><body>NOT FOUND</body></html>"; 					//treba aj davat body? ,content
+        stream << "\n" << content;
+    } else if (num == 3) {
+		stream << "HTTPS/" << res.versionMajor << "." << res.versionMinor
+               << " " << res.statusCode3 << " " << res.status3 << "\n";
+        
+		for (pair<std::string, std::string> i : res.headers) {
+            stream << i.first << ": " << i.second << "\n";
+        }
+        stream << "\n" << content;
     }
     return stream.str();
 }
@@ -94,40 +102,39 @@ json datab_mult() {
     return m;
 }
 
-class GraphBuilder { //nefunguje gtools.h
+class GraphBuilder {
 
-    Graph g = createG(); //nefunguje, treba dat vytvorit ten graf az v tom make_graph alebo to uz sparsovat v tej funkcii a potom poslat string
+    Graph g = createG(); 
     json info;
-    json m;
+    json array_of_mult;
     std::map<int, Number> map_of_vert;
     std::map<pair<int, std::string>, Number> map_of_mult;
 
 public:
 	GraphBuilder(json data) {
-        m = datab_mult();
+        array_of_mult = datab_mult();
         info = data;
     }
 
     Graph & make_graph() {
         int c = 0;
-        for (auto& e : info["vertices"]) {
+        for (auto& v : info["vertices"]) {
             c++;
-            int v = std::stoi(e.get<std::string>());
-            map_of_vert[v] = c;
+            int vertex = std::stoi(v.get<std::string>());
+            map_of_vert[vertex] = c;
             addV(g, c);
         }
-        for (auto& e : info["multipoles"]) {
-            for (auto& j : m) {
-                if (e["name"] == j["name"]) {
-                    Graph multipol = read_sparse6(j["underlying_graph"].get<std::string>().begin(), j["underlying_graph"].get<std::string>().end());
+        for (auto& m : info["multipoles"]) {
+            for (auto& a_o_m : array_of_mult) {
+                if (m["name"] == a_o_m["name"]) {
+                    Graph multipol = read_graph6_line(a_o_m["underlying_graph"].get<std::string>());
                     int min_n = min_offset(g);
                     add_graph(g, multipol, min_n);
-                    int id = std::stoi(e["id"].get<std::string>());
-                    for (auto& k : j["dangling_edges_mapping"]) {
-                        for (auto& l : k.items()) {
-                            //c++;
-                            int value = std::stoi(l.value().get<std::string>());
-                            map_of_mult[{ id, l.key()}] = min_n + value; 									//c
+                    int id = std::stoi(m["id"].get<std::string>());
+                    for (auto& d_e_g : a_o_m["dangling_edges_mapping"]) {
+                        for (auto& i : d_e_g.items()) {
+                            int value = std::stoi(i.value().get<std::string>());
+                            map_of_mult[{ id, i.key()}] = min_n + value;
                         }
                     }
                     break;
@@ -194,7 +201,7 @@ int main(int argc, char const *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    while (true) { // 
+    while (true) { 
 
         if ((new_socket = accept(server_fd, (struct sockaddr *) &address, (socklen_t*) & addrlen)) < 0) {
             perror("accept");
@@ -208,7 +215,7 @@ int main(int argc, char const *argv[]) {
         HttpRequestParser parser;
         HttpRequestParser::ParseResult res = parser.parse(request, buffer, buffer + sizeof (buffer));
 
-        if (res == HttpRequestParser::ParsingCompleted) {				//nechat alebo odstranit
+        if (res == HttpRequestParser::ParsingCompleted) {				
 
             std::cout << request.method << std::endl; //
             std::cout << request.uri << std::endl; //
@@ -218,25 +225,35 @@ int main(int argc, char const *argv[]) {
 
             if (request.method == "POST") {
                 if (request.uri.compare(0, 6, "/graph") == 0) {
-                    /*json info = json::parse(data);
-                    GraphBuilder gb(info);
-                    try {
-                        Graph g = gb.make_graph();
-                        std::string s =	write_sparse6(g);
-		
-                        std::string str = make_response(1, "plain", s);
-                        const char * resp = str.c_str();
-                        send(new_socket, resp, strlen(resp), 0);
+					if (data.empty()) {														
+						Graph g = createG();
+						std::string s =	write_sparse6(g);
+						
+						std::string str = make_response(1, "plain", s);
+						const char * resp = str.c_str();
+						send(new_socket, resp, strlen(resp), 0);
 						close(new_socket);
-                    }
-                    catch(const std::invalid_argument& e) {
-                        std::string str = make_response(2, "html");
-                        const char * resp = str.c_str();
-                        send(new_socket, resp, strlen(resp), 0);
-						close(new_socket);						
-                    }*/
+					} else {						
+						json info = json::parse(data);
+						GraphBuilder gb(info);
+						try {
+							Graph &g = gb.make_graph();
+							std::string s =	write_sparse6(g);
+		
+							std::string str = make_response(1, "plain", s);
+							const char * resp = str.c_str();
+							send(new_socket, resp, strlen(resp), 0);	
+							close(new_socket);
+						}
+						catch(const std::invalid_argument& e) {
+							std::string str = make_response(2);
+							const char * resp = str.c_str();
+							send(new_socket, resp, strlen(resp), 0);
+							close(new_socket);						
+						}
+					}	
                 } else {
-                    string str = make_response(2, "html");
+                    string str = make_response(2);
                     const char * resp = str.c_str();
                     send(new_socket, resp, strlen(resp), 0);
 					close(new_socket);
@@ -251,34 +268,36 @@ int main(int argc, char const *argv[]) {
                     send(new_socket, resp, strlen(resp), 0);
 					close(new_socket);
                 } else if (request.uri.compare(0, 11, "/invariants") == 0) {
-                    Graph g = read_sparse6(data.begin(), data.end());
+					std::string graph_code = request.uri.substr(12);
+                    Graph g = read_graph6_line(graph_code);
                     json invariants;
-                    invariants["girth"] = girth(g); //netreba to dat do uvodzoviek ?
+                    invariants["girth"] = girth(g); 											//treba dat do stringu asi
                     invariants["max_deg"] = max_deg(g);
                     invariants["min_deg"] = min_deg(g);
-                    /*if(invariants["max_deg"] == 3 && invariants["min_deg"] == 3){
+					invariants["chromatic_index"] = chromatic_index_basic(g);
+					/*if(invariants["max_deg"] == 3 && invariants["min_deg"] == 3){
 						invariants["cyclic_connectivity"] = cyclic_connectivity(g);
-                    }	*/
+                    }*/
 
                     std::string s = invariants.dump();
-                    std::string str = make_response(1, "json", s); // typ json ?
+                    std::string str = make_response(1, "json", s); 								
                     const char * resp = str.c_str();
                     send(new_socket, resp, strlen(resp), 0);
 					close(new_socket);
                 } else {
-                    string str = make_response(2, "html");
+                    string str = make_response(2);
                     const char * resp = str.c_str();
                     send(new_socket, resp, strlen(resp), 0);
 					close(new_socket);
                 }
             }
         } else {
-            string str = make_response(2, "html");					
+            string str = make_response(3);
             const char * resp = str.c_str();
             send(new_socket, resp, strlen(resp), 0);
 			close(new_socket);
         }
-    }//
+    }
     return 0;
 }
 
