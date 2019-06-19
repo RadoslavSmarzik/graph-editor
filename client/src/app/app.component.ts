@@ -342,8 +342,7 @@ export class AppComponent implements OnInit {
   graph() {
     const url = 'http://localhost:8080/graph';
     let data = {'vertices': Data.vertices_in_graph, 'multipoles': Data.multipoles_in_graph, 'edges': Data.edges_in_graph};
-    console.log(data);
-
+    Data.codeDisable.disable = false;
     $.ajax({
       url: url,
       method: 'POST',
@@ -374,7 +373,7 @@ export class AppComponent implements OnInit {
 
     $.ajax({
       url: url,
-      method: 'POST',
+      method: 'GET',
       data: JSON.stringify(data),
       contentType: 'text/plain',
       dataType: 'text',
