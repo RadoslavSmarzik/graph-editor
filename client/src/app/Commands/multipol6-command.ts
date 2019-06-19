@@ -2,13 +2,14 @@ import {Command} from './command';
 import {fabric} from 'fabric';
 import {Data} from '../data';
 
-export class Multipol5Command implements Command {
+export class Multipol6Command implements Command {
   group: any;
   terminal1: any;
   terminal2: any;
   terminal3: any;
   terminal4: any;
   terminal5: any;
+  terminal6: any;
   multipol: any;
   array: any;
   first_time: boolean;
@@ -16,19 +17,20 @@ export class Multipol5Command implements Command {
   multipolJS: any;
 
 
-  constructor(id, name1, name2, name3, name4, name5, type) {
+  constructor(id, name1, name2, name3, name4, name5, name6, type) {
     this.multipolJS = {
       'name': type,
       'id': id.toString(),
 
 
     };
+
     this.id = id;
     this.first_time = true;
     this.array = new Array();
 
     this.create_center_of_multipol(id, type);
-    this.create_dangling_edges(name1, name2, name3, name4, name5);
+    this.create_dangling_edges(name1, name2, name3, name4, name5, name6);
     this.create_multipol_object();
     this.add_doubleclick_to_static_multipol();
     this.add_doubleclick_to_moveable_multipol();
@@ -45,13 +47,14 @@ export class Multipol5Command implements Command {
     this.group.addWithUpdate(this.terminal3);
     this.group.addWithUpdate(this.terminal4);
     this.group.addWithUpdate(this.terminal5);
-    this.group.set('type', 'multipol5');
+    this.group.addWithUpdate(this.terminal6);
+    this.group.set('type', 'multipol6');
     this.group.set('name', this.id);
     this.group.lockScalingX = true;
     this.group.lockScalingY = true;
     this.group.lockRotation = true;
-    this.group.set('static_color', '#BF00FF');
-    this.group.set('main_color', '#E2A9F3');
+    this.group.set('static_color', '#FF8000');
+    this.group.set('main_color', '#FFBF80');
     this.multipol.set('positionLeft', this.group.left);
     this.multipol.set('positionTop', this.group.top);
 
@@ -62,7 +65,7 @@ export class Multipol5Command implements Command {
       const left = this.left;
       const top = this.top;
 
-      for (let i = 0; i < 6; i++) {
+      for (let i = 0; i < 7; i++) {
         this.item(i).set('positionLeft', left);
         this.item(i).set('positionTop', top);
         Data.canvas.add(this.item(i));
@@ -81,10 +84,10 @@ export class Multipol5Command implements Command {
         Data.canvas.remove(Data.array_of_multipoles_objects[this.name][i]);
       }
 
-      Data.array_of_multipoles_objects[this.name][6].set('left', this.positionLeft);
-      Data.array_of_multipoles_objects[this.name][6].set('top', this.positionTop);
-      this.item(0).set('fill', Data.array_of_multipoles_objects[this.name][6].main_color);
-      Data.canvas.add(Data.array_of_multipoles_objects[this.name][6]);
+      Data.array_of_multipoles_objects[this.name][7].set('left', this.positionLeft);
+      Data.array_of_multipoles_objects[this.name][7].set('top', this.positionTop);
+      this.item(0).set('fill', Data.array_of_multipoles_objects[this.name][7].main_color);
+      Data.canvas.add(Data.array_of_multipoles_objects[this.name][7]);
 
       Data.canvas.remove(Data.label);
       Data.canvas.renderAll();
@@ -95,7 +98,7 @@ export class Multipol5Command implements Command {
 
   }
 
-  create_dangling_edges(terminal1name, terminal2name, terminal3name, terminal4name, terminal5name) {
+  create_dangling_edges(terminal1name, terminal2name, terminal3name, terminal4name, terminal5name, terminal6name) {
     this.terminal1 = new fabric.Circle({
       radius: 30,
       fill: 'pink',
@@ -109,27 +112,27 @@ export class Multipol5Command implements Command {
     this.terminal2 = new fabric.Circle({
       radius: 30,
       fill: 'pink',
-      top: 200,
+      top: 175,
       stroke: 'black',
-      left: 30,
+      left: 40,
       strokeWidth: 5,
       name: terminal2name
     });
     this.terminal3 = new fabric.Circle({
       radius: 30,
       fill: 'pink',
-      top: 292,
+      top: 265,
       stroke: 'black',
-      left: 55,
+      left: 40,
       strokeWidth: 5,
       name: terminal3name
     });
     this.terminal4 = new fabric.Circle({
       radius: 30,
       fill: 'pink',
-      top: 292,
+      top: 265,
       stroke: 'black',
-      left: 185,
+      left: 200,
       strokeWidth: 5,
       name: terminal4name
     });
@@ -137,29 +140,42 @@ export class Multipol5Command implements Command {
     this.terminal5 = new fabric.Circle({
       radius: 30,
       fill: 'pink',
-      top: 200,
+      top: 175,
       stroke: 'black',
-      left: 210,
+      left: 200,
       strokeWidth: 5,
       name: terminal5name
     });
+
+    this.terminal6 = new fabric.Circle({
+      radius: 30,
+      fill: 'pink',
+      top: 310,
+      stroke: 'black',
+      left: 122,
+      strokeWidth: 5,
+      name: terminal6name
+    });
+
     let terminal1JS = {'type': 'multipol', 'id': this.id.toString(), 'dangling_edge': this.terminal1.name};
     let terminal2JS = {'type': 'multipol', 'id': this.id.toString(), 'dangling_edge': this.terminal2.name};
     let terminal3JS = {'type': 'multipol', 'id': this.id.toString(), 'dangling_edge': this.terminal3.name};
     let terminal4JS = {'type': 'multipol', 'id': this.id.toString(), 'dangling_edge': this.terminal4.name};
     let terminal5JS = {'type': 'multipol', 'id': this.id.toString(), 'dangling_edge': this.terminal5.name};
+    let terminal6JS = {'type': 'multipol', 'id': this.id.toString(), 'dangling_edge': this.terminal6.name};
 
     this.terminal1.set('representationJS', terminal1JS);
     this.terminal2.set('representationJS', terminal2JS);
     this.terminal3.set('representationJS', terminal3JS);
     this.terminal4.set('representationJS', terminal4JS);
     this.terminal5.set('representationJS', terminal5JS);
+    this.terminal6.set('representationJS', terminal6JS);
   }
 
   create_center_of_multipol(id, type) {
     let circle = new fabric.Circle({
       radius: 50,
-      fill: '#E2A9F3',
+      fill: '#FFBF80',
       top: 200,
       left: 100,
       stroke: 'black',
@@ -195,12 +211,13 @@ export class Multipol5Command implements Command {
     this.array[3] = this.terminal3;
     this.array[4] = this.terminal4;
     this.array[5] = this.terminal5;
-    this.array[6] = this.group;
+    this.array[6] = this.terminal6;
+    this.array[7] = this.group;
 
     Data.array_of_multipoles_objects[this.id] = this.array;
 
 
-    for (let i = 1; i < 6; i++) {
+    for (let i = 1; i < 7; i++) {
       this.array[i].set('positionLeft', this.group.left);
       this.array[i].set('positionTop', this.group.top);
       this.array[i].set('main_color', 'pink');
@@ -209,7 +226,7 @@ export class Multipol5Command implements Command {
       this.array[i].set('multipol', this.id);
       this.array[i].lockMovementX = true;
       this.array[i].lockMovementY = true;
-      this.array[i].set('multipol_type', 'multipol5');
+      this.array[i].set('multipol_type', 'multipol6');
     }
 
 
@@ -221,8 +238,8 @@ export class Multipol5Command implements Command {
       Data.canvas.add(this.group);
       this.first_time = false;
     } else {
-      Data.array_of_multipoles_objects[this.multipol.name][6].set('left', this.multipol.positionLeft);
-      Data.array_of_multipoles_objects[this.multipol.name][6].set('top', this.multipol.positionTop);
+      Data.array_of_multipoles_objects[this.multipol.name][7].set('left', this.multipol.positionLeft);
+      Data.array_of_multipoles_objects[this.multipol.name][7].set('top', this.multipol.positionTop);
 
       for (let i = 0; i < Data.array_of_multipoles_objects[this.group.name].length - 1; i++) {
         Data.canvas.add(Data.array_of_multipoles_objects[this.group.name][i]);
@@ -237,7 +254,7 @@ export class Multipol5Command implements Command {
     const left = this.group.left;
     const top = this.group.top;
 
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 7; i++) {
       this.group.item(i).set('positionLeft', left);
       this.group.item(i).set('positionTop', top);
     }

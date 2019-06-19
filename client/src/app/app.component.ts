@@ -8,6 +8,7 @@ import {Multipol3Command} from './Commands/multipol3-command';
 import {Multipol2Command} from './Commands/multipol2-command';
 import * as $ from 'jquery';
 import {Multipol5Command} from './Commands/multipol5-command';
+import {Multipol6Command} from './Commands/multipol6-command';
 
 
 @Component({
@@ -117,7 +118,7 @@ export class AppComponent implements OnInit {
           Data.canvas.add(Data.label);
           this.renderAll();
         }
-        if (e.target.type == 'multipol4' || e.target.type == 'multipol3' || e.target.type == 'multipol2' || e.target.type == 'multipol5') {
+        if (e.target.type == 'multipol4' || e.target.type == 'multipol3' || e.target.type == 'multipol2' || e.target.type == 'multipol5' || e.target.type == 'multipol6') {
           e.target.item(0).item(1).set('fill', 'black');
           Data.name_of_active_object = e.target.item(0).item(1);
           this.renderAll();
@@ -126,7 +127,7 @@ export class AppComponent implements OnInit {
 
       }
 
-      if (e.target instanceof fabric.Circle && e.target.type == 'fakeVrchol') {
+      if (e.target instanceof fabric.Circle && e.target.type == 'terminal') {
         const top = e.e.pageY;
         const left = e.e.pageX;
         Data.label = new fabric.Text(e.target.name, {
@@ -153,7 +154,7 @@ export class AppComponent implements OnInit {
         e.target.item(0).set('fill', '#1E90FF');
 
       }
-      if (e.target.type == 'fakeVrchol') {
+      if (e.target.type == 'terminal') {
         e.target.set('fill', '#1E90FF');
       }
       Data.firstVertex = e.target;
@@ -181,7 +182,7 @@ export class AppComponent implements OnInit {
       Data.selectedVertex = activeObject;
 
       Data.secondVertex = e.target;
-      if ((Data.firstVertex.type == 'vertex' || Data.firstVertex.type == 'fakeVrchol') && (Data.secondVertex.type == 'vertex' || Data.secondVertex.type == 'fakeVrchol')) {
+      if ((Data.firstVertex.type == 'vertex' || Data.firstVertex.type == 'terminal') && (Data.secondVertex.type == 'vertex' || Data.secondVertex.type == 'terminal')) {
 
         let edge = new EdgeCommand(Data.firstVertex, Data.secondVertex);
         edge.execute();
@@ -246,7 +247,7 @@ export class AppComponent implements OnInit {
 
   change_moveable_for_static() {
     Data.canvas.forEachObject(function (obj) {
-      if (obj.type == 'multipol4' || obj.type == 'multipol3' || obj.type == 'multipol2' || obj.type == 'multipol5') {
+      if (obj.type == 'multipol4' || obj.type == 'multipol3' || obj.type == 'multipol2' || obj.type == 'multipol5' || obj.type == 'multipol6') {
         const left = obj.left;
         const top = obj.top;
         let size = Data.array_of_multipoles_objects[obj.name].length - 1;
@@ -283,6 +284,10 @@ export class AppComponent implements OnInit {
     }
     if (dangling_edges.length == 5) {
       multipol = new Multipol5Command(this.multipolName, dangling_edges[0], dangling_edges[1], dangling_edges[2], dangling_edges[3], dangling_edges[4], type);
+
+    }
+    if (dangling_edges.length == 6) {
+      multipol = new Multipol6Command(this.multipolName, dangling_edges[0], dangling_edges[1], dangling_edges[2], dangling_edges[3], dangling_edges[4], dangling_edges[5], type);
 
     }
 
@@ -339,7 +344,22 @@ export class AppComponent implements OnInit {
     let data = {'vertices': Data.vertices_in_graph, 'multipoles': Data.multipoles_in_graph, 'edges': Data.edges_in_graph};
     console.log(data);
 
-    $.post(url, data, function (data, status) {
+    $.ajax({
+      url: url,
+      method: 'POST',
+      data: JSON.stringify(data),
+      contentType: 'text/plain',
+      dataType: 'json',
+      crossDomain: true,
+      success: function (data) {
+        Data.graph_code = data;
+        Data.codeDisable.disable = false;
+
+      }
+
+    });
+
+    /*$.post(url, data, function (data, status) {
       if (status = 'success') {
         Data.graph_code = data;
         Data.codeDisable.disable = false;
@@ -347,7 +367,7 @@ export class AppComponent implements OnInit {
     })
       .fail(function () {
         alert('error');
-      });
+      });*/
 
 
   }

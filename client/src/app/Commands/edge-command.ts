@@ -31,6 +31,9 @@ export class EdgeCommand implements Command {
     if (fakeVertex.multipol_type == 'multipol5') {
       points.push(new fabric.Point(fakeVertex.positionLeft + 117.5, fakeVertex.positionTop + 117.5));
     }
+    if (fakeVertex.multipol_type == 'multipol6') {
+      points.push(new fabric.Point(fakeVertex.positionLeft + 117.5, fakeVertex.positionTop + 117.5));
+    }
   }
 
   create_polyline(points) {
@@ -94,7 +97,7 @@ export class EdgeCommand implements Command {
   execute() {
     const points = [];
 
-    if (this.first.type == 'fakeVrchol') {
+    if (this.first.type == 'terminal') {
       Data.canvas.remove(this.first);
 
       Data.canvas.remove(Data.label);
@@ -111,7 +114,7 @@ export class EdgeCommand implements Command {
     }
 
 
-    if (this.second.type == 'fakeVrchol') {
+    if (this.second.type == 'terminal') {
       Data.canvas.remove(this.second);
 
       Data.canvas.remove(Data.label);
@@ -149,14 +152,14 @@ export class EdgeCommand implements Command {
       this.make_vertex_moveable(this.second);
     }
 
-    if (this.first.type == 'fakeVrchol') {
+    if (this.first.type == 'terminal') {
       Data.canvas.add(this.first);
       if (this.how_many_edges_multipol_has(this.first.multipol) == 0) {
         this.multipol_becomes_moveable(this.first.multipol);
       }
     }
 
-    if (this.second.type == 'fakeVrchol') {
+    if (this.second.type == 'terminal') {
       Data.canvas.add(this.second);
       if (this.how_many_edges_multipol_has(this.second.multipol) == 0) {
         this.multipol_becomes_moveable(this.second.multipol);

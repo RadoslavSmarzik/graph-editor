@@ -1,11 +1,12 @@
 import {Command} from './command';
 import {fabric} from 'fabric';
 import {Data} from '../data';
+import {Multipol5Command} from './multipol5-command';
 
 export class Multipol2Command implements Command {
   group: any;
-  fake1: any;
-  fake2: any;
+  terminal1: any;
+  terminal2: any;
   multipol: any;
   array: any;
   first_time: boolean;
@@ -35,8 +36,8 @@ export class Multipol2Command implements Command {
   create_multipol_object() {
     this.group = new fabric.Group();
     this.group.addWithUpdate(this.multipol);
-    this.group.addWithUpdate(this.fake1);
-    this.group.addWithUpdate(this.fake2);
+    this.group.addWithUpdate(this.terminal1);
+    this.group.addWithUpdate(this.terminal2);
     this.group.set('type', 'multipol2');
     this.group.set('name', this.id);
     this.group.lockScalingX = true;
@@ -86,32 +87,32 @@ export class Multipol2Command implements Command {
 
   }
 
-  create_dangling_edges(fake1name, fake2name) {
-    this.fake1 = new fabric.Circle({
+  create_dangling_edges(terminal1name, terminal2name) {
+    this.terminal1 = new fabric.Circle({
       radius: 30,
       fill: 'pink',
       top: 222,
       stroke: 'black',
       left: 30,
       strokeWidth: 5,
-      name: fake1name
+      name: terminal1name
     });
 
-    this.fake2 = new fabric.Circle({
+    this.terminal2 = new fabric.Circle({
       radius: 30,
       fill: 'pink',
       top: 222,
       stroke: 'black',
       left: 210,
       strokeWidth: 5,
-      name: fake2name
+      name: terminal2name
     });
-    let fake1JS = {'type': 'multipol', 'id': this.id.toString(), 'dangling_edge': this.fake1.name};
-    let fake2JS = {'type': 'multipol', 'id': this.id.toString(), 'dangling_edge': this.fake2.name};
+    let terminal1JS = {'type': 'multipol', 'id': this.id.toString(), 'dangling_edge': this.terminal1.name};
+    let terminal2JS = {'type': 'multipol', 'id': this.id.toString(), 'dangling_edge': this.terminal2.name};
 
 
-    this.fake1.set('representationJS', fake1JS);
-    this.fake2.set('representationJS', fake2JS);
+    this.terminal1.set('representationJS', terminal1JS);
+    this.terminal2.set('representationJS', terminal2JS);
   }
 
   create_center_of_multipol(id, type) {
@@ -148,8 +149,8 @@ export class Multipol2Command implements Command {
 
   add_objects_to_global_array() {
     this.array[0] = this.multipol;
-    this.array[1] = this.fake1;
-    this.array[2] = this.fake2;
+    this.array[1] = this.terminal1;
+    this.array[2] = this.terminal2;
     this.array[3] = this.group;
 
     Data.array_of_multipoles_objects[this.id] = this.array;
@@ -157,7 +158,7 @@ export class Multipol2Command implements Command {
       this.array[i].set('positionLeft', this.group.left);
       this.array[i].set('positionTop', this.group.top);
       this.array[i].set('main_color', 'pink');
-      this.array[i].set('type', 'fakeVrchol');
+      this.array[i].set('type', 'terminal');
       this.array[i].set('edges', 0);
       this.array[i].set('multipol', this.id);
       this.array[i].lockMovementX = true;
@@ -202,5 +203,6 @@ export class Multipol2Command implements Command {
     Data.multipoles_in_graph.splice(index, 1);
 
   }
+
 
 }
