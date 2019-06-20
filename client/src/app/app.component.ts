@@ -23,7 +23,8 @@ export class AppComponent implements OnInit {
   disableUndo: any;
   disableRedo: any;
   vertexName: number;
-  disableCode: Boolean;
+  disableCode: any;
+  className: any;
 
 
   ngOnInit(): void {
@@ -32,14 +33,16 @@ export class AppComponent implements OnInit {
     this.canvas.selection = false;
     this.disableStart = false;
     this.disableStop = true;
+
+    Data.className = {name: ''};
     Data.state = 0;
     Data.commands = [];
-    Data.array_of_multipoles_objects = new Array();
+    Data.array_of_multipoles_objects = [];
     Data.canvas = this.canvas;
-    Data.vertices_in_graph = new Array();
-    Data.multipoles_in_graph = new Array();
-    Data.edges_in_graph = new Array();
-    Data.vertices_in_graph = new Array<number>();
+    Data.vertices_in_graph = [];
+    Data.multipoles_in_graph = [];
+    Data.edges_in_graph = [];
+    Data.vertices_in_graph = [];
     Data.name_of_active_object = null;
     Data.graph_code = null;
     Data.multipoles_for_use = [];
@@ -48,14 +51,17 @@ export class AppComponent implements OnInit {
     Data.codeDisable = {disable: true};
     Data.multipolName = 1;
 
+    this.className = Data.className;
     this.disableRedo = Data.redoBooelan;
     this.disableCode = Data.codeDisable;
     this.disableUndo = Data.undoBooelan;
 
-    this.get_multipoles();
     this.set_selection_on_canvas();
     this.set_mouse_over_on_canvas();
     this.set_mouse_out_on_canvas();
+
+    this.get_multipoles();
+
   }
 
 
@@ -207,6 +213,7 @@ export class AppComponent implements OnInit {
     this.vertexName++;
     Data.codeDisable.disable = true;
 
+
   }
 
 
@@ -264,16 +271,25 @@ export class AppComponent implements OnInit {
     const url = 'http://localhost:8080/multipol';
     $.get(url, function (data, status) {
       if (status == 'success') {
+        let scroll_bar = false;
+        if (data.length > 4) {
+          Data.className.name = 'scrollbar scrollbar-primary';
+          scroll_bar = true;
+        }
+
         for (let i = 0; i < data.length; i++) {
           let btn = document.createElement('BUTTON');
           let text = document.createTextNode(data[i]['name']);
 
-          btn.setAttribute('style', 'font-size:15px');
-
+          btn.setAttribute('style', 'font-size:13px');
+          if (scroll_bar == true) {
+            btn.classList.add('small_button');
+          }
 
           btn.appendChild(text);
 
-          document.getElementById('myDIV').appendChild(btn);
+          document.getElementById('multipoles_buttons').appendChild(btn);
+
 
           btn.onclick = function () {
             let multipol;
@@ -311,16 +327,20 @@ export class AppComponent implements OnInit {
             Data.commands.push(multipol);
             Data.state = Data.commands.length;
             Data.codeDisable.disable = true;
+
           };
           index++;
         }
       } else {
+
         alert('error');
+
       }
 
     })
 
       .fail(function () {
+
         alert('Try refresh');
       });
 
@@ -330,8 +350,10 @@ export class AppComponent implements OnInit {
 
   graph() {
     const url = 'http://localhost:8080/graph';
+    //const url =   "https://jsonplaceholder.typicode.com/posts";
     let data = {'vertices': Data.vertices_in_graph, 'multipoles': Data.multipoles_in_graph, 'edges': Data.edges_in_graph};
-
+    console.log(data);
+    console.log(JSON.stringify(data));
 
     $.ajax({
       url: url,
@@ -346,13 +368,25 @@ export class AppComponent implements OnInit {
 
       },
       error: function (data) {
+        Data.codeDisable.disable = true;
         alert('error');
+
 
 
       }
 
     });
-
+  /*  $.post(url, JSON.stringify(data), function (data, status) {
+      if (status = 'success') {
+        console.log(data);
+        Data.graph_code = data;
+        Data.codeDisable.disable = false;
+      }
+    })
+      .fail(function () {
+        alert('error');
+      });
+*/
 
   }
 
@@ -361,11 +395,11 @@ export class AppComponent implements OnInit {
     const url = 'http://localhost:8080/invariants';
     let data = Data.graph_code;
 
-    $.get(url,data, function (data, status) {
+    $.get(url, data, function (data, status) {
       if (status == 'success') {
         let result = '';
         $.each(data, function (key, value) {
-          result += key + ': ' + value + '\n';
+          result += key.toUpperCase() + ': ' + value + '\n';
         });
         alert(result);
 
@@ -379,6 +413,32 @@ export class AppComponent implements OnInit {
         alert('error');
       })
     ;
+
+    /*
+     $.ajax({
+      url: url,
+      method: 'GET',
+      data: data,
+      contentType: 'text/plain',
+      dataType: 'text',
+      crossDomain: true,
+      success: function (data) {
+        let result = '';
+        $.each(data, function (key, value) {
+          result += key.toUpperCase() + ': ' + value + '\n';
+        });
+        alert(result);
+
+      },
+      error: function (data) {
+        alert('error');
+
+
+
+      }
+
+    });
+     */
 
   }
 

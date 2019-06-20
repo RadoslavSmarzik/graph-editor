@@ -20,6 +20,8 @@ export class Data {
   static codeDisable: any;
   static multipolName:number;
   static undoBooelan: any;
+  static className:any;
+
 
 
 }

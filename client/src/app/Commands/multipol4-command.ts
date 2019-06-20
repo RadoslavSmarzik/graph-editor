@@ -234,6 +234,5 @@ export class Multipol4Command implements Command {
 
     let index = Data.multipoles_in_graph.indexOf(this.multipolJS);
     Data.multipoles_in_graph.splice(index, 1);
-
   }
 }

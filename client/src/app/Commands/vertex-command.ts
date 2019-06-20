@@ -10,13 +10,16 @@ export class VertexCommand implements Command {
   group: any;
   vertexJS: any;
   id: number;
+  representant:any;
 
   constructor(canvas, id) {
     this.id = id;
     this.vertexJS = {'type': 'vertex', 'id': id.toString()};
     this.canvas = canvas;
     this.create_vertex();
+    this.representant = id.toString();
   }
+
 
   create_vertex() {
     this.circle = new fabric.Circle({
@@ -62,15 +65,18 @@ export class VertexCommand implements Command {
   execute() {
     this.canvas.add(this.group);
     this.canvas.moveTo(this.group, 100);
-    Data.vertices_in_graph.push(this.id.toString());
+    Data.vertices_in_graph.push(this.representant);
 
   }
 
   unexecute() {
     this.canvas.remove(this.group);
 
-    let index = Data.vertices_in_graph.indexOf(this.id);
-    Data.vertices_in_graph.splice(index, 1);
+    let index = Data.vertices_in_graph.indexOf(this.representant);
+    if (index !== -1) {
+      Data.vertices_in_graph.splice(index, 1);
+    }
+
 
   }
 

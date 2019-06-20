@@ -52,7 +52,7 @@ export class EdgeCommand implements Command {
     this.first.lockMovementY = true;
     this.second.lockMovementX = true;
     this.second.lockMovementY = true;
-    Data.edges_in_graph.push(this.edgeJS);
+
   }
 
 
@@ -130,6 +130,7 @@ export class EdgeCommand implements Command {
       points.push(new fabric.Point(this.second.left + 32.5, this.second.top + 32.5));
     }
     this.create_polyline(points);
+    Data.edges_in_graph.push(this.edgeJS);
 
   }
 

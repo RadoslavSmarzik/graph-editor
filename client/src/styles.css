@@ -24,3 +24,13 @@ button:disabled:hover{
   width: 150px;
 
 }
+.small_button{
+  width:130px;
+  padding:10px;
+  background-color: dodgerblue;
+}
+.small_button:hover{
+  width:140px;
+  padding:15px;
+  background-color: blue;
+}
