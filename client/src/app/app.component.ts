@@ -184,6 +184,7 @@ export class AppComponent implements OnInit {
         while (Data.commands.length > Data.state) {
           Data.commands.pop();
         }
+        Data.codeDisable.disable = true;
         Data.redoBooelan.redo = true;
         Data.commands.push(edge);
         Data.state = Data.commands.length;
@@ -350,10 +351,7 @@ export class AppComponent implements OnInit {
 
   graph() {
     const url = 'http://localhost:8080/graph';
-    //const url =   "https://jsonplaceholder.typicode.com/posts";
     let data = {'vertices': Data.vertices_in_graph, 'multipoles': Data.multipoles_in_graph, 'edges': Data.edges_in_graph};
-    console.log(data);
-    console.log(JSON.stringify(data));
 
     $.ajax({
       url: url,
@@ -371,22 +369,9 @@ export class AppComponent implements OnInit {
         Data.codeDisable.disable = true;
         alert('error');
 
-
-
       }
 
     });
-  /*  $.post(url, JSON.stringify(data), function (data, status) {
-      if (status = 'success') {
-        console.log(data);
-        Data.graph_code = data;
-        Data.codeDisable.disable = false;
-      }
-    })
-      .fail(function () {
-        alert('error');
-      });
-*/
 
   }
 
@@ -414,31 +399,6 @@ export class AppComponent implements OnInit {
       })
     ;
 
-    /*
-     $.ajax({
-      url: url,
-      method: 'GET',
-      data: data,
-      contentType: 'text/plain',
-      dataType: 'text',
-      crossDomain: true,
-      success: function (data) {
-        let result = '';
-        $.each(data, function (key, value) {
-          result += key.toUpperCase() + ': ' + value + '\n';
-        });
-        alert(result);
-
-      },
-      error: function (data) {
-        alert('error');
-
-
-
-      }
-
-    });
-     */
 
   }
 

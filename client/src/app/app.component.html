@@ -8,31 +8,30 @@
     </li>
 
 
+    <div id="multipoles_buttons" [className]=className.name>
 
-      <div  id="multipoles_buttons" [className]=className.name>
-
-      </div>
+    </div>
 
 
     <br>
-
-
 
 
     <li>
       <button (click)="graph()">SEND GRAPH</button>
     </li>
     <li>
-      <button (click)="graph_code()" [disabled]="disableCode.disable" class = "less_important">SHOW GRAPH CODE</button>
+      <button (click)="graph_code()" [disabled]="disableCode.disable" class="less_important">SHOW GRAPH CODE</button>
     </li>
     <li>
-      <button (click)="copy_code()" [disabled]="disableCode.disable"  class = "less_important">COPY GRAPH CODE</button>
+      <button (click)="copy_code()" [disabled]="disableCode.disable" class="less_important">COPY GRAPH CODE</button>
     </li>
     <li>
-      <button (click)="download('graph.txt','text/plain')" [disabled]="disableCode.disable"  class = "less_important">DOWNLOAD CODE</button>
+      <button (click)="download('graph.txt','text/plain')" [disabled]="disableCode.disable" class="less_important">
+        DOWNLOAD CODE
+      </button>
     </li>
     <li>
-      <button (click)="get_invariants()" [disabled]="disableCode.disable" >INVARIANTS</button>
+      <button (click)="get_invariants()" [disabled]="disableCode.disable">INVARIANTS</button>
     </li>
 
 
