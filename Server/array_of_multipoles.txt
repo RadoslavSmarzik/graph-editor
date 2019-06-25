@@ -3,18 +3,18 @@
 		"name": "negator_Pg",
 		"dangling_edges": ["i1", "i2", "o1", "o2", "r"],
 		"underlying_graph": ":KmKsROIaPRsIZ",
-		"dangling_edges_mapping": [{"i1": "8"}, {"i2": "9"}, {"o1": "11"}, {"o2": "10"}, {"r": "0"}]
+		"dangling_edges_mapping": [{"i1": "0"}, {"i2": "3"}, {"o1": "1"}, {"o2": "2"}, {"r": "4"}]
 	},
 	{
 		"name": "isochromatic_Pg",
 		"dangling_edges": ["i1", "i2", "o1", "o2"],
 		"underlying_graph": ":KkUcrFcS{QE_On",
-		"dangling_edges_mapping": [{"i1": "8"}, {"i2": "9"}, {"o1": "10"}, {"o2": "11"}]
+		"dangling_edges_mapping": [{"i1": "0"}, {"i2": "3"}, {"o1": "1"}, {"o2": "2"}]
 	},
 	{
 		"name": "(2,3)-pole_Pg",
 		"dangling_edges": ["i1", "i2", "o1", "o2", "o3"],
 		"underlying_graph": ":MmYhxgc]HcoIi`R^",
-		"dangling_edges_mapping": [{"i1": "9"}, {"i2": "10"}, {"o1": "11"}, {"o2": "12"}, {"o3": "13"}]
+		"dangling_edges_mapping": [{"i1": "2"}, {"i2": "3"}, {"o1": "4"}, {"o2": "0"}, {"o3": "1"}]
 	}
 ]
